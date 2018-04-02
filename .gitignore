@@ -1,0 +1,6 @@
+__pycache__/
+uploads/
+*.pyc
+db.sqlite3
+.DS_Store
+/.dokku

@@ -1,0 +1,54 @@
+{% extends 'userarea/vehicles/vehicle_base.html' %}
+{% load staticfiles %}
+
+
+{% block vehiclebody %}
+
+
+   <section class="content container-fluid">
+      <div class="row">
+         <div class="col-md-12">
+            <div class="box box-success">
+               <div class="box-header with-border">
+                  <h3 class="box-title">Photos</h3>
+                  <div class="box-tools pull-right">
+                      <input type="hidden" role="uploadcare-uploader" name="content" data-public-key="40f59388915fb580a3b8" data-images-only/>
+
+                      <script type="text/javascript">
+                        var singleWidget = uploadcare.SingleWidget('[role=uploadcare-uploader]');
+                        singleWidget.onUploadComplete(function(info) {
+                          obj = {
+                            url : info.cdnUrl,
+                            file_type : 'IMAGE',
+                            linked_object_type: 'VEHICLE',
+                            linked_object_id: {{object.id}}
+                          }
+                          $.post( "/fileupload/", obj).done(function(data) {
+                            if(data){
+                              location.reload();
+                            }else{
+                              alert("failed");
+                            }
+                          });
+                        });
+                      </script>
+                  </div>
+               </div>
+
+              <div class="box-body table-responsive">
+                <div class="timeline-body">
+                  {% for p in photos %}
+                    <a href="{{p.url}}" target="_blank"><img src="{{p.url}}-/resize/150x100/" alt="..." class="margin"></a>
+                  {% endfor %}
+
+                </div>
+              </div>
+            </div>
+         </div>
+      </div>
+
+
+   </section>
+
+
+{% endblock %}

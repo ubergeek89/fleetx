@@ -1,0 +1,53 @@
+{% extends 'userarea/base.html' %}
+
+
+{% block body %}
+{% load staticfiles %}
+
+
+<div class="content-wrapper">
+   <section class="content container-fluid">
+      <div class="row">
+         <div class="col-md-12">
+            <div class="box box-success">
+               <div class="box-header with-border">
+                  <h3 class="box-title">List Of All Vehicles</h3>
+                  <div class="box-tools pull-right">
+                      <a href="{% url 'fleetxapp:vehicleadd' %}">
+                        <button type="submit" class="btn btn-success btn-flat">Add New Vehicle</button>
+                      </a>
+                  </div>
+               </div>
+               <div class="box-body table-responsive">
+                  <table id="example1" class="table table-bordered table-hover">
+                     <thead>
+                        <tr>
+                           <th>Name</th>
+                           <th>Registration Number</th>
+                           <th>Type</th>
+                           <th>Status</th>
+                           <th>Assigned To</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                      {% for object in object_list %}
+                        <tr>
+                           <td><a href="{% url 'fleetxapp:vehicledetail' object.id %}">{{object.name}}</a></td>
+                           <td>{{object.registration_number}}</td>
+                           <td>{{object.vehicle_type.vehicle_type}}</td>
+                           <td>
+                              <span class="badge" style="background:{{object.status.color}}">{{object.status.vehicle_status}}</span>
+                            </td>
+                           <td>{{object.assigned_to.full_name}}</td>                      
+                        </tr>
+                      {% endfor %}
+                     </tbody>
+                  </table>
+               </div>
+            </div>
+         </div>
+      </div>
+   </section>
+</div>
+
+{% endblock %}

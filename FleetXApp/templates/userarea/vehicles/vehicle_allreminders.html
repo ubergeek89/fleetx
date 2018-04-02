@@ -1,0 +1,87 @@
+{% extends 'userarea/vehicles/vehicle_base.html' %}
+{% load staticfiles %}
+
+
+{% block vehiclebody %}
+
+
+   <section class="content container-fluid">
+      <div class="row">
+         <div class="col-md-12">
+            <div class="box box-success">
+               <div class="box-header with-border">
+                  <h3 class="box-title">Vehicle Reminders</h3>
+                  <div class="box-tools pull-right">
+                      <a href="{% url 'fleetxapp:vehicleremindersadd' object.id%}">
+                        <button type="submit" class="btn btn-success btn-flat">Add New Vehicle Reminder</button>
+                      </a>
+                  </div>
+               </div>
+
+              <div class="box-body table-responsive">
+                  <table class="table table-bordered table-hover">
+                     <thead>
+                        <tr>
+                           <th>Vehicle Reminder No.</th>                          
+                           <th>Vehicle</th>
+                           <th>Reminder Type</th>
+                           <th>Due Date</th>
+                           <th>Current Status</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                      {% for object in vehiclereminders %}
+                        <tr>
+                           <td><a href="{% url 'fleetxapp:vehicleremindersedit' object.id%}">{{object.id}}</a></td>
+                           <td><a href="{% url 'fleetxapp:vehicledetail' object.vehicle.id %}">{{object.vehicle.name}}</a></td>
+                           <td>{{object.vehicle_reminder_type.reminder_type}}</td>
+                           <td>{{object.due_date}}</td>                           
+                           <td></td>
+                        </tr>
+                      {% endfor %}
+                     </tbody>
+                  </table>
+              </div>
+            </div>
+
+
+            <div class="box box-success">
+               <div class="box-header with-border">
+                  <h3 class="box-title">Service Reminders</h3>
+                  <div class="box-tools pull-right">
+                      <a href="{% url 'fleetxapp:serviceremindersadd' object.id%}">
+                        <button type="submit" class="btn btn-success btn-flat">Add New Service Reminder</button>
+                      </a>
+                  </div>
+               </div>
+
+              <div class="box-body table-responsive">
+                  <table class="table table-bordered table-hover">
+                     <thead>
+                        <tr>
+                           <th>Service Reminder No.</th>                          
+                           <th>Vehicle</th>
+                           <th>Reminder Type</th>
+                           <th>Due At Meter Reading</th>
+                           <th>Current Status</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                      {% for object in servicereminders %}
+                        <tr>
+                           <td><a href="{% url 'fleetxapp:serviceremindersedit' object.id%}">{{object.id}}</a></td>
+                           <td><a href="{% url 'fleetxapp:vehicledetail' object.vehicle.id %}">{{object.vehicle.name}}</a></td>
+                           <td>{{object.service_reminder_type.reminder_type}}</td>
+                           <td>{{object.odometer_reading}}</td>                           
+                           <td></td>
+                        </tr>
+                      {% endfor %}
+                     </tbody>
+                  </table>
+              </div>
+            </div>            
+         </div>
+      </div>
+   </section>
+
+{% endblock %}

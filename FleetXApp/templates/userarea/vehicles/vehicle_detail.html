@@ -1,0 +1,128 @@
+{% extends 'userarea/vehicles/vehicle_base.html' %}
+{% load staticfiles %}
+
+
+{% block vehiclebody %}
+
+
+   <section class="content container-fluid">
+      <div class="row">
+         <div class="col-md-12">
+            <div class="box box-success">
+              <div class="box-body table-responsive">
+                <div class="row">
+                   <div class="col-md-3">
+                        <font size="6" color="#00a65a">1,23,455 miles</font><br />
+                        Odometer reading (<a href="#">Update</a>)
+                   </div>
+                   <div class="col-md-3">
+                        <font size="6" color="#00a65a">$26,000</font><br />
+                        Total fuel cost
+                   </div>
+                   <div class="col-md-3">
+                        <font size="6" color="#00a65a">$47,000</font><br />
+                        Total service cost
+                   </div>
+                   <div class="col-md-3">
+                        <font size="6" color="#00a65a">5.5 miles/litre</font><br />
+                        Mileage
+                   </div>         
+                </div>
+              </div>
+            </div>
+         </div>
+      </div>
+
+
+
+      <div class="row">
+         <div class="col-md-6">
+            <div class="box box-success">
+               <div class="box-header with-border">
+                  <h3 class="box-title">Vehicle Details</h3>
+                  <div class="box-tools pull-right">
+                      <a href="{% url 'fleetxapp:vehicleedit' object.id %}">
+                        <button type="submit" class="btn btn-success btn-flat">Edit</button>
+                      </a>
+                  </div>
+               </div>
+               <div class="box-body table-responsive">
+                  <table class="table table-bordered table-hover">
+                    <tr>
+                       <td>Name</td>
+                       <td>{{object.name}}</td>
+                    </tr>
+                    <tr>
+                       <td>Registration No.</td>
+                       <td>{{object.registration_number}}</td>
+                    </tr>
+                    <tr>
+                       <td>Type</td>
+                       <td>{{object.vehicle_type.vehicle_type}}</td>
+                    </tr>
+                    <tr>
+                       <td>Status</td>
+                       <td>
+                          <span class="badge" style="background:{{object.status.color}}">{{object.status.vehicle_status}}</span>
+                       </td>
+                    </tr>
+                    <tr>
+                       <td>Color</td>
+                       <td>{{object.vehicle_color}}</td>
+                    </tr>
+                    <tr>
+                       <td>Year</td>
+                       <td>{{object.year}}</td>
+                    </tr>
+                    <tr>
+                       <td>Make</td>
+                       <td>{{object.make.vehicle_make}}</td>
+                    </tr>
+                    <tr>
+                       <td>Model</td>
+                       <td>{{object.model.vehicle_model}}</td>
+                    </tr>
+                    <tr>
+                       <td>Assigned To</td>
+                       <td>{{object.assigned_to.full_name}}</td>
+                    </tr>
+                  </table>                
+               </div>
+            </div>
+
+         </div>
+
+         <div class="col-md-6">
+            <div class="box box-success">
+               <div class="box-header with-border">
+                  <h3 class="box-title">Reminders</h3>
+                  <div class="box-tools pull-right">
+                      <a href="{% url 'fleetxapp:vehicleremindersadd' object.id%}">
+                        <button type="submit" class="btn btn-success btn-flat">Add New</button>
+                      </a>
+                  </div>
+               </div>
+               <div class="box-body table-responsive">
+               </div>
+            </div>
+
+            <div class="box box-success">
+               <div class="box-header with-border">
+                  <h3 class="box-title">Comments</h3>
+                  <div class="box-tools pull-right">
+                      <a href="#">
+                        <button type="submit" class="btn btn-success btn-flat">Add New</button>
+                      </a>
+                  </div>
+               </div>
+               <div class="box-body table-responsive">
+               </div>
+            </div>            
+
+         </div>
+
+      </div>
+   </section>
+
+
+{% endblock %}

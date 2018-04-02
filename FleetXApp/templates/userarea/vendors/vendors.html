@@ -1,0 +1,50 @@
+{% extends 'userarea/base.html' %}
+
+
+{% block body %}
+{% load staticfiles %}
+
+<div class="content-wrapper">
+   <section class="content container-fluid">
+      <div class="row">
+         <div class="col-md-12">
+            <div class="box box-success">
+               <div class="box-header with-border">
+                  <h3 class="box-title">List Of All Vendors</h3>
+                  <div class="box-tools pull-right">
+                      <a href="{% url 'fleetxapp:vendorsadd' %}">
+                        <button type="submit" class="btn btn-success btn-flat">Add New Vendor</button>
+                      </a>
+                  </div>
+               </div>
+               <div class="box-body table-responsive">
+                  <table id="example1" class="table table-bordered table-hover">
+                     <thead>
+                        <tr>
+                           <th>Vendor No.</th>
+                           <th>Vendor Name</th>                           
+                           <th>Vendor Type</th>                                                      
+                        </tr>
+                     </thead>
+                     <tbody>
+                      {% for object in object_list %}
+                        <tr>
+                           <td><a href="{% url 'fleetxapp:vendorsedit' object.id%}">{{object.id}}</a></td>
+                           <td><a href="{% url 'fleetxapp:vendorsedit' object.id%}">{{object.name}}</a></td>
+                           <td>{{object.vendor_type.vendor_type}}</td>
+                        </tr>
+                      {% endfor %}
+                     </tbody>
+                  </table>
+               </div>
+            </div>
+         </div>
+      </div>
+   </section>
+</div>
+
+
+
+
+
+{% endblock %}

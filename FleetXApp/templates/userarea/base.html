@@ -1,0 +1,130 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>FleetX</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="{% static 'bower_components/bootstrap/dist/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'bower_components/font-awesome/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'bower_components/Ionicons/css/ionicons.min.css' %}">
+    <link rel="stylesheet" href="{% static 'bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css' %}">    
+    <link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}"> 
+    <link rel="stylesheet" href="{% static 'bower_components/select2/dist/css/select2.min.css' %}">
+    <link rel="stylesheet" href="{% static 'dist/css/AdminLTE.min.css' %}">
+    <script charset="utf-8" src="https://ucarecdn.com/libs/widget/3.2.3/uploadcare.full.min.js"></script>    
+    <link rel="stylesheet" href="{% static 'dist/css/skins/skin-green.min.css' %}">
+    <link rel="stylesheet" href="{% static 'bower_components/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css' %}">    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+  </head>
+  <body class="hold-transition skin-green sidebar-mini">
+    <div class="wrapper">
+      <header class="main-header">
+        <a href="{% url 'fleetxapp:dashboard' %}" class="logo">
+        <span class="logo-mini"><b>FL</b>X</span>
+        <span class="logo-lg">Fleet<b>X</b></span>
+        </a>
+        <nav class="navbar navbar-static-top" role="navigation">
+          <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+          <span class="sr-only">Toggle navigation</span>
+          </a>
+          <div class="navbar-custom-menu">
+            <ul class="nav navbar-nav">
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{user.contact.account.organization_name}} <span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="{% url 'fleetxapp:profile' %}" style="color: #753434;">My Profile</a></li>
+                  <li><a href="{% url 'fleetxapp:logout' %}" style="color: #753434;">Logout</a></li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </nav>
+      </header>
+      <aside class="main-sidebar">
+        <section class="sidebar">
+          <ul class="sidebar-menu" data-widget="tree">
+            <li><a href="{% url 'fleetxapp:dashboard' %}"><i class="fa fa-home"></i> <span>Dashboard</span></a></li>
+            <li><a href="{% url 'fleetxapp:vehicles' %}"><i class="fa fa-truck"></i> <span>Vehicles</span></a></li>
+            <li><a href="{% url 'fleetxapp:vehiclereminders' %}"><i class="fa fa-calendar-check-o"></i> <span>Vehicle Reminders</span></a></li>
+            <li><a href="{% url 'fleetxapp:servicereminders' %}"><i class="fa fa-calendar-check-o"></i> <span>Service Reminders</span></a></li>            
+            <li><a href="{% url 'fleetxapp:issues' %}"><i class="fa fa-support"></i> <span>Issues</span></a></li>
+            <li><a href="{% url 'fleetxapp:vehiclereminders' %}"><i class="fa fa-wrench"></i> <span>Service Entries</span></a></li>                        
+            <li><a href="{% url 'fleetxapp:fuelentries' %}"><i class="fa fa-battery-half"></i> <span>Fuel Entries</span></a></li>
+            <li><a href="{% url 'fleetxapp:vendors' %}"><i class="fa fa-money"></i> <span>Vendors</span></a></li>
+            <li><a href="{% url 'fleetxapp:reports' %}"><i class="fa fa-bar-chart"></i> <span>Reports</span></a></li>
+            <li><a href="{% url 'fleetxapp:contacts' %}"><i class="fa fa-user"></i> <span>Contacts</span></a></li>
+            <li><a href="{% url 'fleetxapp:settings' %}"><i class="fa fa-tv"></i> <span>Settings</span></a></li>
+          </ul>
+        </section>
+      </aside>
+
+
+
+
+
+
+
+
+
+
+{% block body %}
+
+
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <footer class="main-footer">
+        <div class="pull-right hidden-xs">
+          Made with <i class="fa fa-heart"></i> in New Delhi
+        </div>
+        <strong>Copyright &copy; 2018 <a href="http://growthxhq.com">GrowthX Labs</a></strong> All rights reserved.
+      </footer>
+      <div class="control-sidebar-bg"></div>
+    </div>
+    <script src="{% static 'bower_components/jquery/dist/jquery.min.js' %}"></script>
+    <script src="{% static 'bower_components/select2/dist/js/select2.full.min.js' %}"></script>    
+    <script src="{% static 'bower_components/bootstrap/dist/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js' %}"></script>    
+    <script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script> 
+    <script src="{% static 'bower_components/bootstrap-colorpicker/dist/js/bootstrap-colorpicker.min.js' %}"></script>
+
+    <script src="{% static 'dist/js/adminlte.min.js' %}"></script>
+
+<script>
+  $(function () {
+    $('.select2').select2()
+    $('#example1').DataTable()
+    $('.my-colorpicker1').colorpicker()    
+    $('#id_due_date').datepicker({
+      autoclose: true
+    })
+    $('#id_reported_date').datepicker({
+      autoclose: true
+    })
+    $('#id_date').datepicker({
+      autoclose: true
+    })
+
+  })
+</script>
+
+  </body>
+</html>

@@ -1,0 +1,90 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>FleetX - Login</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="{% static 'bower_components/bootstrap/dist/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'bower_components/font-awesome/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'bower_components/Ionicons/css/ionicons.min.css' %}">
+    <link rel="stylesheet" href="{% static 'dist/css/AdminLTE.min.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/iCheck/square/blue.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+  </head>
+  <body class="hold-transition login-page">
+    <div class="login-box">
+      <div class="login-logo">
+        <a href="/">Fleet<b>X</b></a>
+      </div>
+      <div class="login-box-body">
+        <p class="login-box-msg">Login</p>
+
+
+
+
+        {% if form_success %}
+        <div class="callout callout-success">
+          <p>Success. Please check your email for the new password</p>
+        </div>
+        {% endif %}
+
+        {% if form.non_field_errors %}
+          <div class="callout callout-danger">
+              {% for error in form.non_field_errors %}
+                {{ error }}<br />
+              {% endfor %}
+          </div>
+        {% endif %}
+
+        {% if other_error %}
+          <div class="callout callout-danger">
+              {{other_error}}
+          </div>
+        {% endif %}
+
+        {% if form_success == None %}
+          <form action="" method="post">
+          {% csrf_token %}
+          {% for field in form.visible_fields %}
+            <div class="form-group has-feedback {% if field.errors %}has-error{% endif %}">
+              {{field}}
+              <span class="glyphicon glyphicon-user form-control-feedback"></span>
+              {% if field.errors %}
+                  <span class="help-block">{% for error in field.errors %}{{ error }}{% endfor %}</span>
+              {% endif %}
+            </div>
+          {% endfor %}
+          <button type="submit" class="btn btn-primary btn-block btn-flat">Login</button>
+          </form>
+        {% endif %}
+
+
+
+
+        <br />
+        <a href="{% url 'fleetxapp:forgotpassword' %}">
+          <button type="submit" class="btn bg-maroon btn-block btn-flat">Forgot Password</button>
+        </a>
+        <br />
+        <a href="{% url 'fleetxapp:register' %}">
+          <button type="submit" class="btn bg-purple btn-block btn-flat">Sign Up For A New Account</button>
+        </a>
+      </div>
+    </div>
+    <script src="{% static 'bower_components/jquery/dist/jquery.min.js' %}"></script>
+    <script src="{% static 'bower_components/bootstrap/dist/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'plugins/iCheck/icheck.min.js' %}"></script>
+    <script>
+      $(function () {
+        $('input').iCheck({
+          checkboxClass: 'icheckbox_square-blue',
+          radioClass: 'iradio_square-blue',
+          increaseArea: '20%' // optional
+        });
+      });
+    </script>
+  </body>
+</html>

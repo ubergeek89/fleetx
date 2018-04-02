@@ -1,0 +1,44 @@
+
+<form action="" method="post">
+{% csrf_token %}
+
+            <div class="form-group has-feedback {% if form.organization_name.errors %}has-error{% endif %}">
+              <input type="text" name= "organization_name" class="form-control" placeholder="Organization Name"
+              {% if form.organization_name.value != None %}value="{{ form.organization_name.value|stringformat:'s' }}"{% endif %}>
+              <span class="glyphicon glyphicon-user form-control-feedback"></span>
+              {% if form.organization_name.errors %}
+                  <span class="help-block">{% for error in form.organization_name.errors %}{{ error }}{% endfor %}</span>
+              {% endif %}
+            </div>            
+            <div class="form-group has-feedback {% if form.full_name.errors %}has-error{% endif %}">
+              <input type="text" name= "full_name" class="form-control" placeholder="Full name"
+                {% if form.full_name.value != None %}value="{{ form.full_name.value|stringformat:'s' }}"{% endif %}>
+              <span class="glyphicon glyphicon-user form-control-feedback"></span>
+              {% if form.full_name.errors %}
+                  <span class="help-block">{% for error in form.full_name.errors %}{{ error }}{% endfor %}</span>
+              {% endif %}              
+            </div>
+            <div class="form-group has-feedback {% if form.email.errors %}has-error{% endif %}">
+              <input type="email" name = "email" class="form-control" placeholder="Email">
+              <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+              {% if form.email.errors %}
+                  <span class="help-block">{% for error in form.email.errors %}{{ error }}{% endfor %}</span>
+              {% endif %}              
+            </div>
+            <div class="form-group has-feedback {% if form.password.errors %}has-error{% endif %}">
+              <input type="password" name = "password" class="form-control" placeholder="Password">
+              <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+              {% if form.password.errors %}
+                  <span class="help-block">{% for error in form.password.errors %}{{ error }}{% endfor %}</span>
+              {% endif %}              
+            </div>
+            <div class="form-group has-feedback {% if form.confirm_password.errors %}has-error{% endif %}">
+              <input type="password" name = "confirm_password" class="form-control" placeholder="Retype password">
+              <span class="glyphicon glyphicon-log-in form-control-feedback"></span>
+              {% if form.confirm_password.errors %}
+                  <span class="help-block">{% for error in form.confirm_password.errors %}{{ error }}{% endfor %}</span>
+              {% endif %}              
+            </div>
+            <button type="submit" class="btn btn-primary btn-block btn-flat">Register</button>
+
+</form>

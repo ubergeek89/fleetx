@@ -1,0 +1,44 @@
+{% extends 'userarea/base.html' %}
+{% load staticfiles %}
+
+{% block body %}
+
+<div class="content-wrapper">
+
+  <section class="content-header" style="background-color: #FFFFFF;">  
+    <table class="table" style="border-color:#FFFFFF;">
+      <tr>
+        <td style="width: 64px; padding:0px; border-color: #FFFFFF;"><img src="/static/car.png" width="84" height="84"/></td>
+        <td style="text-align: left; border-color: #FFFFFF;  padding:5px; padding-left:15px;">
+          <h2 style="margin:0px;">{{object.name}}</h2>
+          {{object.vehicle_type.vehicle_type}}<br />
+          <span class="badge" style="background:{{object.status.color}}">{{object.status.vehicle_status}}</span>
+        </td>
+      </tr>
+    </table>
+    <div class="nav-tabs-custom tab-success" style="margin-bottom: 0px;">
+      <ul class="nav nav-tabs">
+        <li {% if vehicledetails %} class="active" {% endif %}><a href="{% url 'fleetxapp:vehicledetail' object.id %}">Vehicle Details</a></li>
+        <li {% if vehiclephotos %} class="active" {% endif %}><a href="{% url 'fleetxapp:vehiclephotos' object.id %}">Photos</a></li>
+        <li {% if vehicledocuments %} class="active" {% endif %}><a href="{% url 'fleetxapp:vehiclesdocuments' object.id %}">Documents</a></li>
+        <li {% if vehiclecomments %} class="active" {% endif %}><a href="{% url 'fleetxapp:vehiclecomments' object.id %}">Comments</a></li>
+        <li {% if vehiclereminderstab %} class="active" {% endif %}><a href="{% url 'fleetxapp:vehicleallreminders' object.id %}">Reminders</a></li>        
+        <li {% if vehicleissuestab %} class="active" {% endif %}><a href="{% url 'fleetxapp:vehicleallissues' object.id %}">Issues <span class="badge bg-blue">12</span></a></li>
+        <li {% if vehiclefuelentriestab %} class="active" {% endif %}><a href="{% url 'fleetxapp:vehicleallfuelentries' object.id %}">Fuel Entries</a></li>
+        <li {% if servicehistory %} class="active" {% endif %}><a href="">Service Entries</a></li>
+        <li {% if odometerhistory %} class="active" {% endif %}><a href="">Odometer History</a></li>        
+      </ul>
+    </div>
+  </section>
+
+
+
+{% block vehiclebody %}
+
+
+{% endblock %}
+
+</div>
+
+
+{% endblock %}

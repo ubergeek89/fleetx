@@ -1,0 +1,45 @@
+{% extends 'userarea/vehicles/vehicle_base.html' %}
+{% load staticfiles %}
+
+
+{% block vehiclebody %}
+
+
+   <section class="content container-fluid">
+      <div class="row">
+         <div class="col-md-12">
+            <div class="box box-success">
+               <div class="box-header with-border">
+                  <h3 class="box-title">Comments</h3>
+                  <div class="box-tools pull-right">
+                      <a href="{% url 'fleetxapp:commentadd' object_type='Vehicle' object_id=object.id%}?next={{ request.path }}">
+                        <button type="submit" class="btn btn-success btn-flat">Add New Comment</button>
+                      </a>
+                  </div>
+               </div>
+
+              <div class="box-body table-responsive">
+                <div class="timeline-body">
+                  <ul class="timeline">
+                      {% for p in comments %}
+                      <li>
+                          <i class="fa fa-envelope bg-blue"></i>
+                          <div class="timeline-item">
+                              <span class="time"><i class="fa fa-clock-o"></i>{{p.timestamp}}</span>
+                              <h3 class="timeline-header"><a href="#">{{p.author.full_name}}</a> added a comment</h3>
+                              <div class="timeline-body">
+                                      {{p.comment_text}}
+                              </div>
+                          </div>
+                      </li>
+                      {% endfor %}
+                  </ul>
+
+                </div>
+              </div>
+            </div>
+         </div>
+      </div>
+   </section>
+
+{% endblock %}
