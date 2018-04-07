@@ -26,20 +26,52 @@ class Account(models.Model):
 	def __str__(self):
 		return "Account ID: "+ str(self.pk) + " Owner: "+ self.owner.username
 
-class Contact(models.Model):
-	CONTACT_TYPE = (
-			('OWNER', 'OWNER'),
-			('EMPLOYEE', 'EMPLOYEE'),
-			('DRIVER','DRIVER'),
-			('TECHNICIAN','TECHNICIAN')
+
+
+
+class Files(models.Model):
+	FILE_TYPES = (
+			('IMAGE', 'IMAGE'),
+			('DOCUMENT', 'DOCUMENT'),
 		)
+	OBJECT_TYPE = (
+			('Vehicle', 'Vehicle'),
+			('VehicleReminders', 'VehicleReminders'),
+			('ServiceReminders', 'ServiceReminders'),
+			('Issues','Issues'),
+			('FuelEntry','FuelEntry'),
+			('ServiceEntry','ServiceEntry'),
+			('Contact','Contact'),
+		)
+
+	account = models.ForeignKey(Account, on_delete=models.CASCADE)
+	name = models.CharField(max_length=500)
+	uuid = models.CharField(max_length=500)
+	url = models.CharField(max_length=500)
+	file_type = models.CharField(max_length=20, choices=FILE_TYPES)
+	linked_object_type = models.CharField(max_length=20, choices=OBJECT_TYPE)
+	linked_object_id = models.IntegerField()
+	upload_timestamp = models.DateTimeField(default = datetime.now)
+	uploaded_by = models.ForeignKey("Contact", on_delete=models.DO_NOTHING)
+
+	def __str__(self):
+		return "File: "+ str(self.name)
+
+
+
+class Contact(models.Model):
 	user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
 	account = models.ForeignKey(Account, on_delete=models.CASCADE)
+	profilepicture = models.ForeignKey(Files, on_delete=models.DO_NOTHING, blank=True, null=True)
 	full_name = models.CharField(max_length=30)
-	contacttype = models.CharField(max_length=50, choices=CONTACT_TYPE, default="OWNER",)
+	email = models.EmailField(blank=True)
+	is_driver = models.BooleanField(default=False)
+	is_owner = models.BooleanField(default=False)
+	is_user = models.BooleanField(default=False)
 
 	def __str__(self):
 		return "Contact: "+ str(self.full_name)
+
 
 class MasterVehicleTypes(models.Model):
 	account = models.ForeignKey(Account, on_delete=models.CASCADE)
@@ -73,12 +105,11 @@ class MasterModels(models.Model):
 
 class Vehicle(models.Model):
 	account = models.ForeignKey(Account, on_delete=models.CASCADE)
-	#profilepicture = models.ForeignKey(Files, on_delete=models.DO_NOTHING, blank=True, null=True)
+	profilepicture = models.ForeignKey(Files, on_delete=models.DO_NOTHING, blank=True, null=True)
 	name = models.CharField(max_length=30)
 	registration_number = models.CharField(max_length=30)
 	vehicle_type = models.ForeignKey(MasterVehicleTypes, on_delete=models.CASCADE)
 	status = models.ForeignKey(MasterVehicleStatus, on_delete=models.CASCADE)
-	vehicle_color = models.CharField(max_length=30)
 	year = models.IntegerField()
 	make = models.ForeignKey(MasterMakes, on_delete=models.CASCADE, blank=True, null=True)
 	model = models.ForeignKey(MasterModels, on_delete=models.CASCADE, blank=True, null=True)
@@ -103,7 +134,6 @@ class VehicleReminders(models.Model):
 	days_treshold = models.IntegerField()
 	email_notifications = models.BooleanField()
 	notify_contacts = models.ManyToManyField(Contact, related_name="reminders", blank=True)
-	comments = models.TextField(max_length=10000, blank=True,null=True)
 
 	def __str__(self):
 		return "VehicleReminders: "+ str(self.id)
@@ -123,7 +153,6 @@ class ServiceReminders(models.Model):
 	odometer_treshold = models.IntegerField()
 	email_notifications = models.BooleanField()
 	notify_contacts = models.ManyToManyField(Contact, related_name="servicereminders", blank=True)
-	comments = models.TextField(max_length=10000, blank=True,null=True)
 
 	def __str__(self):
 		return "ServiceReminders: "+ str(self.id)
@@ -178,44 +207,32 @@ class FuelEntry(models.Model):
 		return "FuelEntry: "+ str(self.id)
 
 
-
-
-
-
-
-
-
-
-
-
-class Files(models.Model):
-	FILE_TYPES = (
-			('IMAGE', 'IMAGE'),
-			('DOCUMENT', 'DOCUMENT'),
-		)
-	OBJECT_TYPE = (
-			('VEHICLE', 'VEHICLE'),
-			('REMINDER', 'REMINDER'),
-			('ISSUE','ISSUE'),
-			('FUELENTRY','FUELENTRY'),
-			('SERVICEENTRY','SERVICEENTRY'),
-		)
-
+class ServiceEntry(models.Model):
 	account = models.ForeignKey(Account, on_delete=models.CASCADE)
-	url = models.CharField(max_length=500)
-	file_type = models.CharField(max_length=20, choices=FILE_TYPES)
-	linked_object_type = models.CharField(max_length=20, choices=OBJECT_TYPE)
-	linked_object_id = models.IntegerField()
+	vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE)
+	date = models.DateField()
+	total_amount = models.DecimalField(max_digits=10, default=0, decimal_places=5, blank=True)
+	vendor = models.ForeignKey(Vendors, on_delete=models.DO_NOTHING, blank=True, null=True)
 
 	def __str__(self):
-		return "File: "+ str(self.url)
+		return "ServiceEntry: "+ str(self.id)
+
+
+
+
+
+
+
 
 class Comments(models.Model):
 	OBJECT_TYPE = (
-			('Issues', 'Issues'),
-			('ServiceReminders', 'ServiceReminders'),
+			('Vehicle', 'Vehicle'),
 			('VehicleReminders', 'VehicleReminders'),
-			('Vehicle','Vehicle'),
+			('ServiceReminders', 'ServiceReminders'),
+			('Issues','Issues'),
+			('FuelEntry','FuelEntry'),
+			('ServiceEntry','ServiceEntry'),
+			('Contact','Contact'),
 		)
 
 	account = models.ForeignKey(Account, on_delete=models.CASCADE)
@@ -227,4 +244,3 @@ class Comments(models.Model):
 
 	def __str__(self):
 		return "Comment: "+ str(self.pk)
-

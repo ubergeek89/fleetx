@@ -18,5 +18,5 @@ from django.contrib import admin
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('FleetXApp.urls')),
+    path('app/', include('FleetXApp.urls')),
 ]

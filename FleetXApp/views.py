@@ -130,26 +130,29 @@ class LogoutView(View):
 @method_decorator(login_required, name='dispatch')
 class FileUploadView(View):
 	def post(self, request, *args, **kwargs):
-		print(request.POST)
 		models.Files.objects.create(account = request.user.contact.account,
 			url=request.POST.get('url',''),
 			file_type=request.POST.get('file_type',''),
 			linked_object_type=request.POST.get('linked_object_type',''),
-			linked_object_id=request.POST.get('linked_object_id',''))
+			linked_object_id=request.POST.get('linked_object_id',''),
+			name =request.POST.get('name',''),
+			uuid =request.POST.get('uuid',''),
+			uploaded_by = request.user.contact
+		)
 		return HttpResponse("true")
 
 
 @method_decorator(login_required, name='dispatch')
 class CommentAddView(View):
 	def get(self, request, object_id, object_type):
-		if object_type not in ['Vehicle','Issues','ServiceReminders','VehicleReminders']:
+		if object_type not in ['Vehicle','Issues','ServiceReminders','VehicleReminders','FuelEntry','ServiceEntry','Contact']:
 			raise Http404
 		mymodel = apps.get_model('FleetXApp', object_type)
 		myobject = get_object_or_404(mymodel, pk=object_id)
 		form = forms.CommentForm()
 		return render(request, "userarea/add_comment.html", {'form':form, 'page_title':'Add Comment To '+object_type+' #'+str(object_id) })
 	def post(self, request, object_id, object_type, *args, **kwargs):
-		if object_type not in ['Vehicle','Issues','ServiceReminders','VehicleReminders']:
+		if object_type not in ['Vehicle','Issues','ServiceReminders','VehicleReminders','FuelEntry','ServiceEntry','Contact']:
 			raise Http404
 		mymodel = apps.get_model('FleetXApp', object_type)
 		myobject = get_object_or_404(mymodel, pk=object_id)		
@@ -199,6 +202,8 @@ class VehicleEditView(View):
 		form.fields['vehicle_type'].queryset = models.MasterVehicleTypes.objects.filter(account=self.request.user.contact.account)
 		form.fields['status'].queryset = models.MasterVehicleStatus.objects.filter(account=self.request.user.contact.account)
 		form.fields['make'].queryset = models.MasterMakes.objects.filter(account=self.request.user.contact.account)
+		form.fields['profilepicture'].queryset = models.Files.objects.filter(account=self.request.user.contact.account, 
+			file_type='IMAGE', linked_object_type='Vehicle', linked_object_id=pk)
 		form.fields['model'].queryset = models.MasterModels.objects.filter(account=self.request.user.contact.account)
 		form.fields['assigned_to'].queryset = models.Contact.objects.filter(account=self.request.user.contact.account)
 		return render(request, "userarea/vehicles/vehicle_edit.html", {'object': object, 'form':form, 'page_title':'Edit Vehicle' , 'vehicledetails':True})
@@ -216,6 +221,7 @@ class VehicleEditView(View):
 class VehicleAddView(View):
 	def get(self, request):
 		form = forms.VehicleForm()
+		form.fields.pop('profilepicture')
 		form.fields['vehicle_type'].queryset = models.MasterVehicleTypes.objects.filter(account=self.request.user.contact.account)
 		form.fields['status'].queryset = models.MasterVehicleStatus.objects.filter(account=self.request.user.contact.account)
 		form.fields['make'].queryset = models.MasterMakes.objects.filter(account=self.request.user.contact.account)
@@ -232,34 +238,19 @@ class VehicleAddView(View):
 		return render(request, "userarea/vehicles/vehicle_new.html", {'object': object, 'form':form, 'page_title':'Edit Vehicle'})
 
 
+
 @method_decorator(login_required, name='dispatch')
-class VehiclePhotosView(DetailView):
+class VehicleFilesView(DetailView):
 	model = models.Vehicle
-	template_name = "userarea/vehicles/vehicle_photos.html"
+	template_name = "userarea/vehicles/vehicle_files.html"
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
-		context['photos'] = models.Files.objects.filter(account=self.request.user.contact.account,
-				file_type = 'IMAGE',
-				linked_object_type = 'VEHICLE',
+		context['files'] = models.Files.objects.filter(account=self.request.user.contact.account,
+				linked_object_type = 'Vehicle',
 				linked_object_id=self.kwargs['pk']
-			)
-		context['vehiclephotos']=True
-		return context
-
-@method_decorator(login_required, name='dispatch')
-class VehicleDocumentsView(DetailView):
-	model = models.Vehicle
-	template_name = "userarea/vehicles/vehicle_documents.html"
-
-	def get_context_data(self, **kwargs):
-		context = super().get_context_data(**kwargs)
-		context['photos'] = models.Files.objects.filter(account=self.request.user.contact.account,
-				file_type = 'DOCUMENT',
-				linked_object_type = 'VEHICLE',
-				linked_object_id=self.kwargs['pk']
-			)
-		context['vehicledocuments']=True		
+			).order_by('-upload_timestamp')
+		context['vehiclefiles']=True		
 		return context
 
 
@@ -293,7 +284,7 @@ class VehicleAllRemindersView(DetailView):
 				vehicle__id = self.kwargs['pk']
 			)
 
-		context['vehiclereminderstab']=True		
+		context['reminderstab']=True		
 		return context
 
 
@@ -326,6 +317,120 @@ class VehicleAllFuelEnties(DetailView):
 		return context
 
 
+@method_decorator(login_required, name='dispatch')
+class VehicleAllServiceEnties(DetailView):
+	model = models.Vehicle
+	template_name = "userarea/vehicles/vehicle_allserviceentries.html"
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['vehicleserviceentries'] = models.ServiceEntry.objects.filter(account=self.request.user.contact.account,
+				vehicle__id = self.kwargs['pk']
+			)
+		context['vehicleserviceentriestab']=True		
+		return context
+
+
+@method_decorator(login_required, name='dispatch')
+class VehicleReminderDetail(View):
+	def get(self, request, pk):
+		template_name = "userarea/vehicles/detail_vehiclereminder.html"
+		context={}
+		context['vehiclereminderdetail'] = get_object_or_404(models.VehicleReminders, pk=self.kwargs['pk'])
+		context['object'] = get_object_or_404(models.Vehicle, pk=context['vehiclereminderdetail'].vehicle.id)
+		context['comments'] = models.Comments.objects.filter(account=self.request.user.contact.account,
+				linked_object_type = 'VehicleReminders',
+				linked_object_id=self.kwargs['pk']
+			).order_by('-timestamp')
+		context['files'] = models.Files.objects.filter(account=self.request.user.contact.account,
+				linked_object_type = 'VehicleReminders',
+				linked_object_id=self.kwargs['pk']
+			).order_by('-upload_timestamp')
+		context['reminderstab']=True		
+		return render(request, template_name, context)
+
+
+@method_decorator(login_required, name='dispatch')
+class ServiceReminderDetail(View):
+	def get(self, request, pk):
+		template_name = "userarea/vehicles/detail_servicereminder.html"
+		context={}
+		context['servicereminderdetail'] = get_object_or_404(models.ServiceReminders, pk=self.kwargs['pk'])
+		context['object'] = get_object_or_404(models.Vehicle, pk=context['servicereminderdetail'].vehicle.id)
+		context['comments'] = models.Comments.objects.filter(account=self.request.user.contact.account,
+				linked_object_type = 'ServiceReminders',
+				linked_object_id=self.kwargs['pk']
+			).order_by('-timestamp')
+		context['files'] = models.Files.objects.filter(account=self.request.user.contact.account,
+				linked_object_type = 'ServiceReminders',
+				linked_object_id=self.kwargs['pk']
+			).order_by('-upload_timestamp')
+
+		context['reminderstab']=True		
+		return render(request, template_name, context)
+
+
+@method_decorator(login_required, name='dispatch')
+class IssueDetail(View):
+	def get(self, request, pk):
+		template_name = "userarea/vehicles/detail_issue.html"
+		context={}
+		context['issuedetail'] = get_object_or_404(models.Issues, pk=self.kwargs['pk'])
+		context['object'] = get_object_or_404(models.Vehicle, pk=context['issuedetail'].vehicle.id)
+		context['comments'] = models.Comments.objects.filter(account=self.request.user.contact.account,
+				linked_object_type = 'Issues',
+				linked_object_id=self.kwargs['pk']
+			).order_by('-timestamp')
+		context['files'] = models.Files.objects.filter(account=self.request.user.contact.account,
+				linked_object_type = 'Issues',
+				linked_object_id=self.kwargs['pk']
+			).order_by('-upload_timestamp')
+		context['vehicleissuestab']=True		
+		return render(request, template_name, context)
+
+
+@method_decorator(login_required, name='dispatch')
+class ServiceEntryDetail(View):
+	def get(self, request, pk):
+		template_name = "userarea/vehicles/detail_serviceentry.html"
+		context={}
+		context['serviceentrydetail'] = get_object_or_404(models.ServiceEntry, pk=self.kwargs['pk'])
+		context['object'] = get_object_or_404(models.Vehicle, pk=context['serviceentrydetail'].vehicle.id)
+		context['comments'] = models.Comments.objects.filter(account=self.request.user.contact.account,
+				linked_object_type = 'ServiceEntry',
+				linked_object_id=self.kwargs['pk']
+			).order_by('-timestamp')
+		context['files'] = models.Files.objects.filter(account=self.request.user.contact.account,
+				linked_object_type = 'ServiceEntry',
+				linked_object_id=self.kwargs['pk']
+			).order_by('-upload_timestamp')
+		context['vehicleserviceentriestab']=True		
+		return render(request, template_name, context)
+
+
+@method_decorator(login_required, name='dispatch')
+class FuelEntryDetail(View):
+	def get(self, request, pk):
+		template_name = "userarea/vehicles/detail_fuelentry.html"
+		context={}
+		context['fuelentrydetail'] = get_object_or_404(models.FuelEntry, pk=self.kwargs['pk'])
+		context['object'] = get_object_or_404(models.Vehicle, pk=context['fuelentrydetail'].vehicle.id)
+		context['comments'] = models.Comments.objects.filter(account=self.request.user.contact.account,
+				linked_object_type = 'FuelEntry',
+				linked_object_id=self.kwargs['pk']
+			).order_by('-timestamp')
+		context['files'] = models.Files.objects.filter(account=self.request.user.contact.account,
+				linked_object_type = 'FuelEntry',
+				linked_object_id=self.kwargs['pk']
+			).order_by('-upload_timestamp')
+
+		context['vehiclefuelentriestab']=True		
+		return render(request, template_name, context)
+
+
+
+
+
 
 @method_decorator(login_required, name='dispatch')
 class VehicleReminderListView(ListView):
@@ -356,7 +461,7 @@ class VehicleReminderAddView(View):
 			instance.save()
 			form.save_m2m()
 			#Crazy - http://www.joshuakehn.com/2013/6/23/django-m2m-modelform.html
-			return HttpResponseRedirect(reverse('fleetxapp:vehiclereminders'))
+			return HttpResponseRedirect(reverse('fleetxapp:vehiclereminderdetail', args=[instance.id]))
 		return render(request, "userarea/reminders/vehiclereminder_new.html", {'form':form, 'page_title':'Add Vehicle Reminder'})
 
 
@@ -379,7 +484,7 @@ class VehicleReminderEditView(View):
 			instance.save()
 			form.save_m2m()
 			#Crazy - http://www.joshuakehn.com/2013/6/23/django-m2m-modelform.html
-			return HttpResponseRedirect(reverse('fleetxapp:vehiclereminders'))
+			return HttpResponseRedirect(reverse('fleetxapp:vehiclereminderdetail', args=[instance.id]))
 		return render(request, "userarea/reminders/vehiclereminder_new.html", {'form':form, 'page_title':'Edit Vehicle Reminder'})
 
 
@@ -412,7 +517,7 @@ class ServiceReminderAddView(View):
 			instance.save()
 			form.save_m2m()
 			#Crazy - http://www.joshuakehn.com/2013/6/23/django-m2m-modelform.html
-			return HttpResponseRedirect(reverse('fleetxapp:servicereminders'))
+			return HttpResponseRedirect(reverse('fleetxapp:servicereminderdetail', args=[instance.id]))
 		return render(request, "userarea/reminders/servicereminder_new.html", {'form':form, 'page_title':'Add Service Reminder'})
 
 
@@ -435,7 +540,7 @@ class ServiceReminderEditView(View):
 			instance.save()
 			form.save_m2m()
 			#Crazy - http://www.joshuakehn.com/2013/6/23/django-m2m-modelform.html
-			return HttpResponseRedirect(reverse('fleetxapp:servicereminders'))
+			return HttpResponseRedirect(reverse('fleetxapp:servicereminderdetail', args=[instance.id]))
 		return render(request, "userarea/reminders/servicereminder_new.html", {'form':form, 'page_title':'Edit Service Reminder'})
 
 
@@ -467,7 +572,7 @@ class IssueAddView(View):
 			instance.save()
 			form.save_m2m()
 			#Crazy - http://www.joshuakehn.com/2013/6/23/django-m2m-modelform.html
-			return HttpResponseRedirect(reverse('fleetxapp:issues'))
+			return HttpResponseRedirect(reverse('fleetxapp:issuedetail', args=[instance.id]))
 		return render(request, "userarea/issues/issue_new.html", {'form':form, 'page_title':'Add Issue'})
 
 
@@ -488,7 +593,7 @@ class IssueEditView(View):
 			instance.save()
 			form.save_m2m()
 			#Crazy - http://www.joshuakehn.com/2013/6/23/django-m2m-modelform.html
-			return HttpResponseRedirect(reverse('fleetxapp:issues'))
+			return HttpResponseRedirect(reverse('fleetxapp:issuedetail', args=[instance.id]))
 		return render(request, "userarea/issues/issue_new.html", {'form':form, 'page_title':'Edit Issue'})
 
 
@@ -554,7 +659,7 @@ class FuelEntryListView(ListView):
 class FuelEntryAddView(View):
 	def get(self, request,pk):
 		if pk > 0:
-			object = get_object_or_404(models.FuelEntry, pk=pk)
+			object = get_object_or_404(models.Vehicle, pk=pk)
 			form = forms.FuelEntryForm(initial={'vehicle':object})
 		else:
 			form = forms.FuelEntryForm()
@@ -568,7 +673,7 @@ class FuelEntryAddView(View):
 			instance.save()
 			form.save_m2m()
 			#Crazy - http://www.joshuakehn.com/2013/6/23/django-m2m-modelform.html
-			return HttpResponseRedirect(reverse('fleetxapp:fuelentries'))
+			return HttpResponseRedirect(reverse('fleetxapp:fuelentrydetail', args=[instance.id]))
 		return render(request, "userarea/fuelentries/fuelentries_new.html", {'form':form, 'page_title':'Add Fuel Entry'})
 
 
@@ -589,23 +694,129 @@ class FuelEntryEditView(View):
 			instance.save()
 			form.save_m2m()
 			#Crazy - http://www.joshuakehn.com/2013/6/23/django-m2m-modelform.html
-			return HttpResponseRedirect(reverse('fleetxapp:fuelentries'))
+			return HttpResponseRedirect(reverse('fleetxapp:fuelentrydetail', args=[instance.id]))
 		return render(request, "userarea/fuelentries/fuelentries_new.html", {'form':form, 'page_title':'Edit Fuel Entry'})
 
 
 
+@method_decorator(login_required, name='dispatch')
+class ServiceEntryListView(ListView):
+	model = models.ServiceEntry	
+	template_name = "userarea/serviceentries/serviceentries.html"
+	def get_queryset(self):
+		queryset = models.ServiceEntry.objects.filter(account=self.request.user.contact.account)
+		return queryset
+
 
 @method_decorator(login_required, name='dispatch')
-class FuelListView(TemplateView):
-	template_name = "userarea/fuel.html"
+class ServiceEntryAddView(View):
+	def get(self, request,pk):
+		if pk > 0:
+			object = get_object_or_404(models.Vehicle, pk=pk)
+			form = forms.ServiceEntryForm(initial={'vehicle':object})
+		else:
+			form = forms.ServiceEntryForm()
+		form.fields['vendor'].queryset = models.Vendors.objects.filter(account=self.request.user.contact.account)
+		return render(request, "userarea/serviceentries/serviceentries_new.html", {'form':form, 'page_title':'Add Service Entry'})
+	def post(self, request, *args, **kwargs):
+		form = forms.ServiceEntryForm(request.POST)
+		if form.is_valid():
+			instance = form.save(commit=False)
+			instance.account = self.request.user.contact.account
+			instance.save()
+			form.save_m2m()
+			return HttpResponseRedirect(reverse('fleetxapp:serviceentrydetail', args=[instance.id]))
+		return render(request, "userarea/serviceentries/serviceentries_new.html", {'form':form, 'page_title':'Add Service Entry'})
+
+
+
+@method_decorator(login_required, name='dispatch')
+class ServiceEntryEditView(View):
+	def get(self, request, pk):
+		object = get_object_or_404(models.ServiceEntry, pk=pk)
+		form = forms.ServiceEntryForm(instance=object)
+		form.fields['vendor'].queryset = models.Vendors.objects.filter(account=self.request.user.contact.account)
+		return render(request, "userarea/serviceentries/serviceentries_new.html", {'form':form, 'page_title':'Edit Service Entry'})
+	def post(self, request, pk, *args, **kwargs):
+		object = get_object_or_404(models.ServiceEntry, pk=pk)
+		form = forms.ServiceEntryForm(request.POST, instance=object)
+		if form.is_valid():
+			instance = form.save(commit=False)
+			instance.account = self.request.user.contact.account
+			instance.save()
+			form.save_m2m()
+			return HttpResponseRedirect(reverse('fleetxapp:serviceentrydetail', args=[instance.id]))
+		return render(request, "userarea/serviceentries/serviceentries_new.html", {'form':form, 'page_title':'Edit Service Entry'})
+
+
+@method_decorator(login_required, name='dispatch')
+class ContactListView(ListView):
+	model = models.Contact	
+	template_name = "userarea/contacts/contacts.html"
+	def get_queryset(self):
+		queryset = models.Contact.objects.filter(account=self.request.user.contact.account)
+		return queryset
+
+@method_decorator(login_required, name='dispatch')
+class ContactAddView(View):
+	def get(self, request):
+		form = forms.ContactForm()
+		form.fields.pop('profilepicture')
+		return render(request, "userarea/contacts/contacts_new.html", {'form':form, 'page_title':'Add Contact'})
+	def post(self, request, *args, **kwargs):
+		form = forms.ContactForm(request.POST)
+		if form.is_valid():
+			instance = form.save(commit=False)
+			instance.account = self.request.user.contact.account
+			instance.save()
+			form.save_m2m()
+			return HttpResponseRedirect(reverse('fleetxapp:contactdetail',args=[instance.id]))
+		return render(request, "userarea/contacts/contacts_new.html", {'form':form, 'page_title':'Add Contact'})
+
+
+
+@method_decorator(login_required, name='dispatch')
+class ContactEditView(View):
+	def get(self, request, pk):
+		object = get_object_or_404(models.Contact, pk=pk)
+		form = forms.ContactForm(instance=object)
+		form.fields['profilepicture'].queryset = models.Files.objects.filter(account=self.request.user.contact.account, 
+			file_type='IMAGE', linked_object_type='Contact', linked_object_id=pk)
+		return render(request, "userarea/contacts/contacts_new.html", {'form':form, 'page_title':'Edit Contact'})
+	def post(self, request, pk, *args, **kwargs):
+		object = get_object_or_404(models.Contact, pk=pk)
+		form = forms.ContactForm(request.POST, instance=object)
+		if form.is_valid():
+			instance = form.save(commit=False)
+			instance.account = self.request.user.contact.account
+			instance.save()
+			form.save_m2m()
+			return HttpResponseRedirect(reverse('fleetxapp:contactdetail',args=[instance.id]))
+		return render(request, "userarea/contacts/contacts_new.html", {'form':form, 'page_title':'Edit Contact'})
+
+
+@method_decorator(login_required, name='dispatch')
+class ContactDetailView(DetailView):
+	model = models.Contact
+	template_name = "userarea/contacts/contact_detail.html"
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['comments'] = models.Comments.objects.filter(account=self.request.user.contact.account,
+				linked_object_type = 'Contact',
+				linked_object_id=self.kwargs['pk']
+			).order_by('-timestamp')
+		context['files'] = models.Files.objects.filter(account=self.request.user.contact.account,
+				linked_object_type = 'Contact',
+				linked_object_id=self.kwargs['pk']
+			).order_by('-upload_timestamp')
+
+		context['contactdetail']=True
+		return context
+
 
 @method_decorator(login_required, name='dispatch')
 class ReportListView(TemplateView):
 	template_name = "userarea/reports.html"
-
-@method_decorator(login_required, name='dispatch')
-class ContactListView(TemplateView):
-	template_name = "userarea/contacts.html"
 
 @method_decorator(login_required, name='dispatch')
 class SettingsView(TemplateView):

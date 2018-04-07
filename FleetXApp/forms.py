@@ -45,10 +45,10 @@ class LoginForm(forms.Form):
 class VehicleForm(forms.ModelForm):
 	class Meta:
 		model=models.Vehicle
-		exclude = ['account','profilepicture']
+		exclude = ['account']
 		widgets = {
-			'vehicle_color': forms.TextInput(attrs={'class':'my-colorpicker1'}),
 			'vehicle_type': forms.Select(attrs={'class':'select2'}),
+			'profilepicture': forms.Select(attrs={'class':'select2'}),
 			'status': forms.Select(attrs={'class':'select2'}),
 			'make': forms.Select(attrs={'class':'select2'}),
 			'model': forms.Select(attrs={'class':'select2'}),
@@ -82,6 +82,7 @@ class IssueForm(forms.ModelForm):
 		widgets = {
 			'vehicle': forms.Select(attrs={'class':'select2'}),
 			'current_status': forms.Select(attrs={'class':'select2'}),			
+			'reported_by': forms.Select(attrs={'class':'select2'}),				
 		}
 
 class CommentForm(forms.ModelForm):
@@ -104,4 +105,21 @@ class FuelEntryForm(forms.ModelForm):
 		widgets = {
 			'vehicle': forms.Select(attrs={'class':'select2'}),
 			'vendor': forms.Select(attrs={'class':'select2'}),			
+		}
+
+class ServiceEntryForm(forms.ModelForm):
+	class Meta:
+		model=models.ServiceEntry
+		exclude = ['account']
+		widgets = {
+			'vehicle': forms.Select(attrs={'class':'select2'}),
+			'vendor': forms.Select(attrs={'class':'select2'}),			
+		}
+
+class ContactForm(forms.ModelForm):
+	class Meta:
+		model=models.Contact
+		exclude = ['account','user','is_owner']
+		widgets = {
+			'profilepicture': forms.Select(attrs={'class':'select2'}),
 		}

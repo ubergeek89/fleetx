@@ -32,7 +32,7 @@
                      <tbody>
                       {% for object in vehiclereminders %}
                         <tr>
-                           <td><a href="{% url 'fleetxapp:vehicleremindersedit' object.id%}">{{object.id}}</a></td>
+                           <td><a href="{% url 'fleetxapp:vehiclereminderdetail' object.id%}">{{object.id}}</a></td>
                            <td><a href="{% url 'fleetxapp:vehicledetail' object.vehicle.id %}">{{object.vehicle.name}}</a></td>
                            <td>{{object.vehicle_reminder_type.reminder_type}}</td>
                            <td>{{object.due_date}}</td>                           
@@ -69,7 +69,7 @@
                      <tbody>
                       {% for object in servicereminders %}
                         <tr>
-                           <td><a href="{% url 'fleetxapp:serviceremindersedit' object.id%}">{{object.id}}</a></td>
+                           <td><a href="{% url 'fleetxapp:servicereminderdetail' object.id%}">{{object.id}}</a></td>
                            <td><a href="{% url 'fleetxapp:vehicledetail' object.vehicle.id %}">{{object.vehicle.name}}</a></td>
                            <td>{{object.service_reminder_type.reminder_type}}</td>
                            <td>{{object.odometer_reading}}</td>                           

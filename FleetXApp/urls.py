@@ -18,12 +18,18 @@ urlpatterns = [
     path('vehicle/<int:pk>/', views.VehicleDetailView.as_view(), name='vehicledetail'),
     path('vehicle/<int:pk>/edit', views.VehicleEditView.as_view(), name='vehicleedit'),    
     path('vehicle/add', views.VehicleAddView.as_view(), name='vehicleadd'),    
-    path('vehicle/<int:pk>/photos', views.VehiclePhotosView.as_view(), name='vehiclephotos'),
-    path('vehicle/<int:pk>/documents', views.VehicleDocumentsView.as_view(), name='vehiclesdocuments'),
+    path('vehicle/<int:pk>/files', views.VehicleFilesView.as_view(), name='vehiclefiles'),
     path('vehicle/<int:pk>/comments', views.VehicleCommentsView.as_view(), name='vehiclecomments'),
     path('vehicle/<int:pk>/reminders', views.VehicleAllRemindersView.as_view(), name='vehicleallreminders'),
     path('vehicle/<int:pk>/issues', views.VehicleAllIssues.as_view(), name='vehicleallissues'),
-    path('vehicle/<int:pk>/fuelentries', views.VehicleAllFuelEnties.as_view(), name='vehicleallfuelentries'),    
+    path('vehicle/<int:pk>/fuelentries', views.VehicleAllFuelEnties.as_view(), name='vehicleallfuelentries'),
+    path('vehicle/<int:pk>/serviceentries', views.VehicleAllServiceEnties.as_view(), name='vehicleallserviceentries'),
+
+    path('vehicle/vehiclereminder/<int:pk>/', views.VehicleReminderDetail.as_view(), name='vehiclereminderdetail'),
+    path('vehicle/servicereminders/<int:pk>/', views.ServiceReminderDetail.as_view(), name='servicereminderdetail'),
+    path('vehicle/issues/<int:pk>/', views.IssueDetail.as_view(), name='issuedetail'),
+    path('vehicle/fuelentries/<int:pk>/', views.FuelEntryDetail.as_view(), name='fuelentrydetail'),
+    path('vehicle/serviceentries/<int:pk>/', views.ServiceEntryDetail.as_view(), name='serviceentrydetail'),
 
     path('vehiclereminders/', views.VehicleReminderListView.as_view(), name='vehiclereminders'),
     path('vehiclereminders/<int:pk>/new', views.VehicleReminderAddView.as_view(), name='vehicleremindersadd'),
@@ -45,10 +51,18 @@ urlpatterns = [
     path('fuelentries/<int:pk>/new', views.FuelEntryAddView.as_view(), name='fuelentriesadd'),
     path('fuelentries/edit/<int:pk>/', views.FuelEntryEditView.as_view(), name='fuelentriesedit'),
 
-    path('reports/', views.ReportListView.as_view(), name='reports'),
-    path('contacts/', views.ContactListView.as_view(), name='contacts'),
-    path('settings/', views.SettingsView.as_view(), name='settings'),
+    path('serviceentries/', views.ServiceEntryListView.as_view(), name='serviceentries'),
+    path('serviceentries/<int:pk>/new', views.ServiceEntryAddView.as_view(), name='serviceentriesadd'),
+    path('serviceentries/edit/<int:pk>/', views.ServiceEntryEditView.as_view(), name='serviceentriesedit'),
 
+    path('contacts/', views.ContactListView.as_view(), name='contacts'),
+    path('contacts/new', views.ContactAddView.as_view(), name='contactsadd'),
+    path('contacts/edit/<int:pk>/', views.ContactEditView.as_view(), name='contactsedit'),
+    path('contact/<int:pk>/', views.ContactDetailView.as_view(), name='contactdetail'),
+
+
+    path('reports/', views.ReportListView.as_view(), name='reports'),
+    path('settings/', views.SettingsView.as_view(), name='settings'),
     path('profile/', views.ProfileView.as_view(), name='profile'),
     path('logout/', views.LogoutView.as_view(), name='logout'),
 ]

@@ -32,7 +32,7 @@
                      <tbody>
                       {% for object in object_list %}
                         <tr>
-                           <td><a href="{% url 'fleetxapp:fuelentriesedit' object.id%}">{{object.id}}</a></td>                           
+                           <td><a href="{% url 'fleetxapp:fuelentrydetail' object.id%}">{{object.id}}</a></td>                           
                            <td><a href="{% url 'fleetxapp:vehicledetail' object.vehicle.id%}">{{object.vehicle.name}}</a></td>
                            <td>{{object.date}}</td>
                            <td>{{object.quantity}}</td>

@@ -68,6 +68,9 @@ class VendorsAdmin(admin.ModelAdmin):
 class FuelEntryAdmin(admin.ModelAdmin):
     list_display = ('account', 'vehicle', 'date','quantity')
 
+@admin.register(models.ServiceEntry)
+class ServiceEntryAdmin(admin.ModelAdmin):
+    list_display = ('account', 'vehicle', 'date','vendor')
 
 
 

@@ -10,10 +10,10 @@
          <div class="col-md-12">
             <div class="box box-success">
                <div class="box-header with-border">
-                  <h3 class="box-title">Fuel Entries</h3>
+                  <h3 class="box-title">Service Entries</h3>
                   <div class="box-tools pull-right">
-                      <a href="{% url 'fleetxapp:fuelentriesadd' object.id%}">
-                        <button type="submit" class="btn btn-success btn-flat">Add New Fuel Entry</button>
+                      <a href="{% url 'fleetxapp:serviceentriesadd' object.id%}">
+                        <button type="submit" class="btn btn-success btn-flat">Add New Service Entry</button>
                       </a>
                   </div>
                </div>
@@ -25,18 +25,16 @@
                            <th>Entry No.</th>                           
                            <th>Vehicle</th>
                            <th>Date</th>                           
-                           <th>Quantity</th>
                            <th>Total Amount</th>                           
                            <th>Vendor</th>                                                      
                         </tr>
                      </thead>
                      <tbody>
-                      {% for object in vehiclefuelentries %}
+                      {% for object in vehicleserviceentries %}
                         <tr>
-                           <td><a href="{% url 'fleetxapp:fuelentrydetail' object.id%}">{{object.id}}</a></td>                           
+                           <td><a href="{% url 'fleetxapp:serviceentrydetail' object.id%}">{{object.id}}</a></td>                           
                            <td><a href="{% url 'fleetxapp:vehicledetail' object.vehicle.id%}">{{object.vehicle.name}}</a></td>
                            <td>{{object.date}}</td>
-                           <td>{{object.quantity}}</td>
                            <td>{{object.total_amount}}</td>
                            <td>{{object.vendor.name}}</td>
                         </tr>

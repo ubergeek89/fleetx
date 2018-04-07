@@ -1,0 +1,41 @@
+{% extends 'userarea/base.html' %}
+{% load staticfiles %}
+
+{% block body %}
+
+<div class="content-wrapper">
+
+  <section class="content-header" style="background-color: #FFFFFF;">  
+    <table class="table" style="border-color:#FFFFFF;">
+      <tr>
+        <td style="width: 64px; padding:0px; border-color: #FFFFFF;">
+          {% if object.profilepicture %}
+          <img src="{{object.profilepicture.url}}" width="84" height="84"/>
+          {% else %}
+          <img src="/static/person.png" width="84" height="84"/>
+          {% endif %}
+        
+        </td>
+        <td style="text-align: left; border-color: #FFFFFF;  padding:5px; padding-left:15px;">
+          <h2 style="margin:0px;">{{object.full_name}}</h2>
+        </td>
+      </tr>
+    </table>
+    <div class="nav-tabs-custom tab-success" style="margin-bottom: 0px;">
+      <ul class="nav nav-tabs">
+        <li {% if contactdetail %} class="active" {% endif %}><a href="{% url 'fleetxapp:contactdetail' object.id %}">Contact Details</a></li>
+      </ul>
+    </div>
+  </section>
+
+
+
+{% block contactbody %}
+
+
+{% endblock %}
+
+</div>
+
+
+{% endblock %}

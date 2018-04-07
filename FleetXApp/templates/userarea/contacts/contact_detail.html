@@ -1,0 +1,184 @@
+{% extends 'userarea/contacts/contact_base.html' %}
+{% load staticfiles %}
+
+
+{% block contactbody %}
+
+
+   <section class="content container-fluid">
+      <div class="row">
+         <div class="col-md-12">
+            <div class="box box-success">
+               <div class="box-header with-border">
+                  <h3 class="box-title">Contact Detail #{{object.id}}</h3>
+                  <div class="box-tools pull-right">
+                      <a href="{% url 'fleetxapp:contactsedit' object.id %}">
+                        <button type="submit" class="btn btn-success btn-flat">Edit</button>
+                      </a>
+                  </div>
+               </div>
+               <div class="box-body table-responsive">
+                  <table class="table table-bordered table-hover">
+                    <tr>
+                       <td>Contact Name:</td>
+                       <td>{{object.full_name}}</td>
+                    </tr>
+                    <tr>
+                       <td>E-Mail:</td>
+                       <td>{{object.email}}</td>
+                    </tr>
+                    <tr>
+                       <td>Is Driver:</td>
+                       <td>{{object.is_driver}}</td>
+                    </tr>
+                    <tr>
+                       <td>Is Owner:</td>
+                       <td>{{object.is_owner}}</td>
+                    </tr>
+                  </table>  
+               </div>
+            </div>
+         </div>
+      </div>
+
+
+
+      <div class="row">
+         <div class="col-md-12">
+            <div class="box box-success">
+               <div class="box-header with-border">
+                  <h3 class="box-title">Assigned Vehicles</h3>
+               </div>
+
+               <div class="box-body table-responsive">
+                  <table class="table table-bordered table-hover">
+                     <thead>
+                        <tr>
+                           <th>Name</th>
+                           <th>Registration Number</th>
+                           <th>Type</th>
+                           <th>Status</th>
+                           <th>Assigned To</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                      {% for object in object.vehicle_set.all %}
+                        <tr>
+                           <td><a href="{% url 'fleetxapp:vehicledetail' object.id %}">{{object.name}}</a></td>
+                           <td>{{object.registration_number}}</td>
+                           <td>{{object.vehicle_type.vehicle_type}}</td>
+                           <td>
+                              <span class="badge" style="background:{{object.status.color}}">{{object.status.vehicle_status}}</span>
+                            </td>
+                           <td>{{object.assigned_to.full_name}}</td>                      
+                        </tr>
+                      {% endfor %}
+                     </tbody>
+                  </table>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <div class="row">
+         <div class="col-md-12">
+            <div class="box box-success">
+               <div class="box-header with-border">
+                  <h3 class="box-title">Files</h3>
+                  <div class="box-tools pull-right">
+                      <input type="hidden" role="uploadcare-uploader" name="content" data-public-key="40f59388915fb580a3b8"/>
+
+                      <script type="text/javascript">
+                        var singleWidget = uploadcare.SingleWidget('[role=uploadcare-uploader]');
+                        singleWidget.onUploadComplete(function(info) {
+                          obj = {
+                            url : info.cdnUrl,
+                            linked_object_type: 'Contact',
+                            linked_object_id: {{object.id}},
+                            name: info.name,
+                            uuid: info.uuid
+                          }
+                          if(info.isImage){
+                            obj.file_type = 'IMAGE'
+                          } else {
+                            obj.file_type = 'DOCUMENT'
+                          }
+                          $.post( "/app/fileupload/", obj).done(function(data) {
+                            if(data){
+                              location.reload();
+                            }else{
+                              alert("failed");
+                            }
+                          });
+                        });
+                      </script>
+                  </div>
+               </div>
+
+              <div class="box-body table-responsive">
+                  <table class="table table-bordered table-hover">
+                     <thead>
+                        <tr>
+                           <th>No.</th>                          
+                           <th>File Name</th>
+                           <th>File Type</th>
+                           <th>Uploaded By</th>
+                           <th>Upload Date</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                      {% for f in files %}
+                        <tr>
+                           <td>{{f.id}}</td>
+                           <td><a href="{{f.url}}" target="_blank">{{f.name}}</a></td>
+                           <td>{{f.file_type}}</td>
+                           <td>{{f.uploaded_by}}</td>
+                           <td>{{f.upload_timestamp}}</td>
+                        </tr>
+                      {% endfor %}
+                     </tbody>
+                  </table>
+              </div>
+            </div>
+         </div>
+      </div>
+
+
+      <div class="row">
+         <div class="col-md-12">
+            <div class="box box-success">
+               <div class="box-header with-border">
+                  <h3 class="box-title">Comments</h3>
+                  <div class="box-tools pull-right">
+                      <a href="{% url 'fleetxapp:commentadd' object_type='Contact' object_id=object.id %}?next={{ request.path }}">
+                        <button type="submit" class="btn btn-success btn-flat">Add New Comment</button>
+                      </a>
+                  </div>
+               </div>
+
+              <div class="box-body table-responsive">
+                <div class="timeline-body">
+                  <ul class="timeline">
+                      {% for p in comments %}
+                      <li>
+                          <i class="fa fa-envelope bg-blue"></i>
+                          <div class="timeline-item">
+                              <span class="time"><i class="fa fa-clock-o"></i>{{p.timestamp}}</span>
+                              <h3 class="timeline-header"><a href="#">{{p.author.full_name}}</a> added a comment</h3>
+                              <div class="timeline-body">
+                                      {{p.comment_text}}
+                              </div>
+                          </div>
+                      </li>
+                      {% endfor %}
+                  </ul>
+
+                </div>
+              </div>
+            </div>
+         </div>
+      </div>
+   </section>
+
+
+{% endblock %}

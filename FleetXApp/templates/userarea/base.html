@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="{% static 'bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css' %}">    
     <link rel="stylesheet" href="{% static 'bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css' %}"> 
     <link rel="stylesheet" href="{% static 'bower_components/select2/dist/css/select2.min.css' %}">
-    <link rel="stylesheet" href="{% static 'dist/css/AdminLTE.min.css' %}">
+    <link rel="stylesheet" href="{% static 'dist/css/AdminLTE.css' %}">
     <script charset="utf-8" src="https://ucarecdn.com/libs/widget/3.2.3/uploadcare.full.min.js"></script>    
     <link rel="stylesheet" href="{% static 'dist/css/skins/skin-green.min.css' %}">
     <link rel="stylesheet" href="{% static 'bower_components/bootstrap-colorpicker/dist/css/bootstrap-colorpicker.min.css' %}">    
@@ -51,11 +51,12 @@
             <li><a href="{% url 'fleetxapp:vehiclereminders' %}"><i class="fa fa-calendar-check-o"></i> <span>Vehicle Reminders</span></a></li>
             <li><a href="{% url 'fleetxapp:servicereminders' %}"><i class="fa fa-calendar-check-o"></i> <span>Service Reminders</span></a></li>            
             <li><a href="{% url 'fleetxapp:issues' %}"><i class="fa fa-support"></i> <span>Issues</span></a></li>
-            <li><a href="{% url 'fleetxapp:vehiclereminders' %}"><i class="fa fa-wrench"></i> <span>Service Entries</span></a></li>                        
+            <li><a href="{% url 'fleetxapp:serviceentries' %}"><i class="fa fa-wrench"></i> <span>Service Entries</span></a></li>                        
             <li><a href="{% url 'fleetxapp:fuelentries' %}"><i class="fa fa-battery-half"></i> <span>Fuel Entries</span></a></li>
             <li><a href="{% url 'fleetxapp:vendors' %}"><i class="fa fa-money"></i> <span>Vendors</span></a></li>
-            <li><a href="{% url 'fleetxapp:reports' %}"><i class="fa fa-bar-chart"></i> <span>Reports</span></a></li>
             <li><a href="{% url 'fleetxapp:contacts' %}"><i class="fa fa-user"></i> <span>Contacts</span></a></li>
+            
+            <li><a href="{% url 'fleetxapp:reports' %}"><i class="fa fa-bar-chart"></i> <span>Reports</span></a></li>
             <li><a href="{% url 'fleetxapp:settings' %}"><i class="fa fa-tv"></i> <span>Settings</span></a></li>
           </ul>
         </section>
@@ -94,13 +95,14 @@
         <div class="pull-right hidden-xs">
           Made with <i class="fa fa-heart"></i> in New Delhi
         </div>
-        <strong>Copyright &copy; 2018 <a href="http://growthxhq.com">GrowthX Labs</a></strong> All rights reserved.
+        <strong>Copyright &copy; 2018 <a href="http://espertosys.com">Espertosys</a></strong> All rights reserved.
       </footer>
       <div class="control-sidebar-bg"></div>
     </div>
     <script src="{% static 'bower_components/jquery/dist/jquery.min.js' %}"></script>
     <script src="{% static 'bower_components/select2/dist/js/select2.full.min.js' %}"></script>    
     <script src="{% static 'bower_components/bootstrap/dist/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'bower_components/Chart.js/Chart.js' %}"></script>
     <script src="{% static 'bower_components/datatables.net/js/jquery.dataTables.min.js' %}"></script>
     <script src="{% static 'bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js' %}"></script>    
     <script src="{% static 'bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script> 
@@ -122,9 +124,13 @@
     $('#id_date').datepicker({
       autoclose: true
     })
-
   })
 </script>
+
+
+{% block footerjs %}
+{% endblock %}
+
 
   </body>
 </html>

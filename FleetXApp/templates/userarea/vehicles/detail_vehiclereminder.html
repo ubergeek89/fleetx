@@ -1,0 +1,153 @@
+{% extends 'userarea/vehicles/vehicle_base.html' %}
+{% load staticfiles %}
+
+
+{% block vehiclebody %}
+
+
+   <section class="content container-fluid">
+      <div class="row">
+         <div class="col-md-12">
+            <div class="box box-success">
+               <div class="box-header with-border">
+                  <h3 class="box-title">Vehicle Reminder #{{vehiclereminderdetail.id}}</h3>
+                  <div class="box-tools pull-right">
+                      <a href="{% url 'fleetxapp:vehicleremindersedit' vehiclereminderdetail.id %}">
+                        <button type="submit" class="btn btn-success btn-flat">Edit</button>
+                      </a>
+                  </div>
+               </div>
+               <div class="box-body table-responsive">
+                  <table class="table table-bordered table-hover">
+                    <tr>
+                       <td width="20%">Vehicle Name:</td>
+                       <td><a href="{% url 'fleetxapp:vehicledetail' vehiclereminderdetail.vehicle.id %}">{{vehiclereminderdetail.vehicle.name}}</a></td>
+                    </tr>
+                    <tr>
+                       <td>Vehicle Reminder Type:</td>
+                       <td>{{vehiclereminderdetail.vehicle_reminder_type.reminder_type}}</td>
+                    </tr>
+                    <tr>
+                       <td>Due Date:</td>
+                       <td>{{vehiclereminderdetail.due_date}}</td>
+                    </tr>
+                    <tr>
+                       <td>Days Treshold:</td>
+                       <td>{{vehiclereminderdetail.days_treshold}}</td>
+                    </tr>
+                    <tr>
+                       <td>Email Notifications :</td>
+                       <td>{{vehiclereminderdetail.email_notifications}}</td>
+                    </tr>
+                    <tr>
+                       <td>Notify Contacts :</td>
+                       <td>{% for k in vehiclereminderdetail.notify_contacts.all %}{{k.full_name}}, {% endfor %}</td>
+                    </tr>
+                  </table>  
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <div class="row">
+         <div class="col-md-12">
+            <div class="box box-success">
+               <div class="box-header with-border">
+                  <h3 class="box-title">Files</h3>
+                  <div class="box-tools pull-right">
+                      <input type="hidden" role="uploadcare-uploader" name="content" data-public-key="40f59388915fb580a3b8"/>
+
+                      <script type="text/javascript">
+                        var singleWidget = uploadcare.SingleWidget('[role=uploadcare-uploader]');
+                        singleWidget.onUploadComplete(function(info) {
+                          obj = {
+                            url : info.cdnUrl,
+                            linked_object_type: 'VehicleReminders',
+                            linked_object_id: {{vehiclereminderdetail.id}},
+                            name: info.name,
+                            uuid: info.uuid
+                          }
+                          if(info.isImage){
+                            obj.file_type = 'IMAGE'
+                          } else {
+                            obj.file_type = 'DOCUMENT'
+                          }
+                          $.post( "/app/fileupload/", obj).done(function(data) {
+                            if(data){
+                              location.reload();
+                            }else{
+                              alert("failed");
+                            }
+                          });
+                        });
+                      </script>
+                  </div>
+               </div>
+
+              <div class="box-body table-responsive">
+                  <table class="table table-bordered table-hover">
+                     <thead>
+                        <tr>
+                           <th>No.</th>                          
+                           <th>File Name</th>
+                           <th>File Type</th>
+                           <th>Uploaded By</th>
+                           <th>Upload Date</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                      {% for f in files %}
+                        <tr>
+                           <td>{{f.id}}</td>
+                           <td><a href="{{f.url}}" target="_blank">{{f.name}}</a></td>
+                           <td>{{f.file_type}}</td>
+                           <td>{{f.uploaded_by}}</td>
+                           <td>{{f.upload_timestamp}}</td>
+                        </tr>
+                      {% endfor %}
+                     </tbody>
+                  </table>
+              </div>
+            </div>
+         </div>
+      </div>
+
+
+      <div class="row">
+         <div class="col-md-12">
+            <div class="box box-success">
+               <div class="box-header with-border">
+                  <h3 class="box-title">Comments</h3>
+                  <div class="box-tools pull-right">
+                      <a href="{% url 'fleetxapp:commentadd' object_type='VehicleReminders' object_id=vehiclereminderdetail.id %}?next={{ request.path }}">
+                        <button type="submit" class="btn btn-success btn-flat">Add New Comment</button>
+                      </a>
+                  </div>
+               </div>
+
+              <div class="box-body table-responsive">
+                <div class="timeline-body">
+                  <ul class="timeline">
+                      {% for p in comments %}
+                      <li>
+                          <i class="fa fa-envelope bg-blue"></i>
+                          <div class="timeline-item">
+                              <span class="time"><i class="fa fa-clock-o"></i>{{p.timestamp}}</span>
+                              <h3 class="timeline-header"><a href="#">{{p.author.full_name}}</a> added a comment</h3>
+                              <div class="timeline-body">
+                                      {{p.comment_text}}
+                              </div>
+                          </div>
+                      </li>
+                      {% endfor %}
+                  </ul>
+
+                </div>
+              </div>
+            </div>
+         </div>
+      </div>
+   </section>
+
+
+{% endblock %}

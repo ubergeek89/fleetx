@@ -10,10 +10,10 @@
          <div class="col-md-12">
             <div class="box box-success">
                <div class="box-header with-border">
-                  <h3 class="box-title">List Of All Vehicle Reminders</h3>
+                  <h3 class="box-title">List Of All Service Entries</h3>
                   <div class="box-tools pull-right">
-                      <a href="{% url 'fleetxapp:vehicleremindersadd' 0 %}">
-                        <button type="submit" class="btn btn-success btn-flat">Add New Vehicle Reminder</button>
+                      <a href="{% url 'fleetxapp:serviceentriesadd' 0 %}">
+                        <button type="submit" class="btn btn-success btn-flat">Add New Service Entry</button>
                       </a>
                   </div>
                </div>
@@ -21,21 +21,21 @@
                   <table id="example1" class="table table-bordered table-hover">
                      <thead>
                         <tr>
-                           <th>Vehicle Reminder No.</th>                          
+                           <th>Entry No.</th>                           
                            <th>Vehicle</th>
-                           <th>Reminder Type</th>
-                           <th>Due Date</th>
-                           <th>Current Status</th>
+                           <th>Date</th>                           
+                           <th>Total Amount</th>                           
+                           <th>Vendor</th>                                                      
                         </tr>
                      </thead>
                      <tbody>
                       {% for object in object_list %}
                         <tr>
-                           <td><a href="{% url 'fleetxapp:vehiclereminderdetail' object.id%}">{{object.id}}</a></td>
-                           <td><a href="{% url 'fleetxapp:vehicledetail' object.vehicle.id %}">{{object.vehicle.name}}</a></td>
-                           <td>{{object.vehicle_reminder_type.reminder_type}}</td>
-                           <td>{{object.due_date}}</td>                           
-                           <td></td>
+                           <td><a href="{% url 'fleetxapp:serviceentrydetail' object.id%}">{{object.id}}</a></td>                           
+                           <td><a href="{% url 'fleetxapp:vehicledetail' object.vehicle.id%}">{{object.vehicle.name}}</a></td>
+                           <td>{{object.date}}</td>
+                           <td>{{object.total_amount}}</td>
+                           <td>{{object.vendor.name}}</td>
                         </tr>
                       {% endfor %}
                      </tbody>

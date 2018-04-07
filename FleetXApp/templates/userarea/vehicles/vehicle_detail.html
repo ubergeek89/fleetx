@@ -36,13 +36,32 @@
 
 
       <div class="row">
-         <div class="col-md-6">
+         <div class="col-md-12">
             <div class="box box-success">
                <div class="box-header with-border">
                   <h3 class="box-title">Vehicle Details</h3>
                   <div class="box-tools pull-right">
+
+
+                <div class="btn-group">
+                  <button type="button" class="btn btn-success">Quick Add</button>
+                  <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown">
+                    <span class="caret"></span>
+                    <span class="sr-only">Toggle Dropdown</span>
+                  </button>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="{% url 'fleetxapp:commentadd' object_type='Vehicle' object_id=object.id %}?next={{ request.path }}">Comment</a></li>
+                    <li><a href="{% url 'fleetxapp:vehicleremindersadd' object.id%}">Vehicle Reminder</a></li>
+                    <li><a href="{% url 'fleetxapp:serviceremindersadd' object.id%}">Service Reminder</a></li>
+                    <li><a href="{% url 'fleetxapp:issuesadd' object.id%}">Issue</a></li>
+                    <li><a href="{% url 'fleetxapp:serviceentriesadd' object.id%}">Service Entry</a></li>
+                    <li><a href="{% url 'fleetxapp:fuelentriesadd' object.id%}">Fuel Entry</a></li>
+                  </ul>
+                </div>
+
+
                       <a href="{% url 'fleetxapp:vehicleedit' object.id %}">
-                        <button type="submit" class="btn btn-success btn-flat">Edit</button>
+                        <button type="submit" class="btn btn-success btn-flat">Edit Vehicle Details</button>
                       </a>
                   </div>
                </div>
@@ -67,10 +86,6 @@
                        </td>
                     </tr>
                     <tr>
-                       <td>Color</td>
-                       <td>{{object.vehicle_color}}</td>
-                    </tr>
-                    <tr>
                        <td>Year</td>
                        <td>{{object.year}}</td>
                     </tr>
@@ -91,36 +106,6 @@
             </div>
 
          </div>
-
-         <div class="col-md-6">
-            <div class="box box-success">
-               <div class="box-header with-border">
-                  <h3 class="box-title">Reminders</h3>
-                  <div class="box-tools pull-right">
-                      <a href="{% url 'fleetxapp:vehicleremindersadd' object.id%}">
-                        <button type="submit" class="btn btn-success btn-flat">Add New</button>
-                      </a>
-                  </div>
-               </div>
-               <div class="box-body table-responsive">
-               </div>
-            </div>
-
-            <div class="box box-success">
-               <div class="box-header with-border">
-                  <h3 class="box-title">Comments</h3>
-                  <div class="box-tools pull-right">
-                      <a href="#">
-                        <button type="submit" class="btn btn-success btn-flat">Add New</button>
-                      </a>
-                  </div>
-               </div>
-               <div class="box-body table-responsive">
-               </div>
-            </div>            
-
-         </div>
-
       </div>
    </section>
 
