@@ -32,8 +32,12 @@
                            <td><a href="{% url 'fleetxapp:contactdetail' object.id%}">{{object.id}}</a></td>
                            <td>
                             <a href="{% url 'fleetxapp:contactdetail' object.id%}">{{object.full_name}}</a>
-                              <span class="badge bg-blue">Me</span>
-                              <span class="badge bg-blue">Owner</span>
+                              {% if user.id|add:0 == object.id %}
+                                <span class="badge bg-blue">Me</span>
+                              {% endif %}
+                              {% if user.contact.is_owner %}
+                                <span class="badge bg-blue">Owner</span>
+                              {% endif %}
                            </td>
                            <td>{{object.email}}</td>
                         </tr>

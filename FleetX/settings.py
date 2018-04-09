@@ -134,10 +134,10 @@ STATIC_URL = '/static/'
 
 
 #These settings are used for automatic error emails which are sent through SMTP servers provided below
-ADMINS = [('Aditya', 'aditya@impulsemedia.co.in')]
-MANAGERS = [('Aditya', 'aditya@impulsemedia.co.in')]
-SERVER_EMAIL = 'server@impulsemedia.co.in'
-DEFAULT_FROM_EMAIL = 'server@impulsemedia.co.in'
+ADMINS = [('Aditya', 'aditya@fleetxhq.com')]
+MANAGERS = [('Aditya', 'aditya@fleetxhq.com')]
+SERVER_EMAIL = 'server@fleetxhq.com'
+DEFAULT_FROM_EMAIL = 'server@fleetxhq.com'
 #ElasticEmail
 EMAIL_HOST = 'smtp.elasticemail.com'
 EMAIL_PORT = 587

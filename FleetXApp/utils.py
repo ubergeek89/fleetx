@@ -12,4 +12,4 @@ def send_email(subject, to, html_message):
 	    fail_silently=False,
 	)
 
-	#k = requests.post("https://api.mailgun.net/v3/mail.fleetxhq.com", auth=("api", "key-c4d137533d353762004b566344ebb11c"), data={"from": "FleetX <no-reply@fleetxhq.com>", "to": "aditya@espertosys.com", "subject": "Hello","text": "Testing some Mailgun awesomness!","html": "<html>HTML version of the body</html>"})
+#k = requests.post("https://api.mailgun.net/v3/mail.fleetxhq.com", auth=("api", "key-c4d137533d353762004b566344ebb11c"), data={"from": "FleetX <no-reply@fleetxhq.com>", "to": "aditya@espertosys.com", "subject": "Hello","text": "Testing some Mailgun awesomness!","html": "<html>HTML version of the body</html>"})
