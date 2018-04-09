@@ -36,7 +36,7 @@ class Files(models.Model):
 		)
 	OBJECT_TYPE = (
 			('Vehicle', 'Vehicle'),
-			('VehicleReminders', 'VehicleReminders'),
+			('VehicleRenewalReminder', 'VehicleRenewalReminder'),
 			('ServiceReminders', 'ServiceReminders'),
 			('Issues','Issues'),
 			('FuelEntry','FuelEntry'),
@@ -119,24 +119,24 @@ class Vehicle(models.Model):
 		return "Vehicle: "+ str(self.name)
 
 
-class MasterVehicleReminderTypes(models.Model):
+class MasterVehicleRenewalReminderType(models.Model):
 	account = models.ForeignKey(Account, on_delete=models.CASCADE)
 	reminder_type = models.CharField(max_length=70)
 
 	def __str__(self):
-		return "VehicleReminderType: "+ str(self.reminder_type)
+		return "MasterVehicleRenewalReminderType: "+ str(self.reminder_type)
 
-class VehicleReminders(models.Model):
+class VehicleRenewalReminder(models.Model):
 	account = models.ForeignKey(Account, on_delete=models.CASCADE)
 	vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE)
-	vehicle_reminder_type = models.ForeignKey(MasterVehicleReminderTypes, on_delete=models.CASCADE)
+	vehicle_reminder_type = models.ForeignKey(MasterVehicleRenewalReminderType, on_delete=models.CASCADE)
 	due_date = models.DateField()
 	days_treshold = models.IntegerField()
 	email_notifications = models.BooleanField()
 	notify_contacts = models.ManyToManyField(Contact, related_name="reminders", blank=True)
 
 	def __str__(self):
-		return "VehicleReminders: "+ str(self.id)
+		return "VehicleRenewalReminder: "+ str(self.id)
 
 class MasterServiceReminderTypes(models.Model):
 	account = models.ForeignKey(Account, on_delete=models.CASCADE)
@@ -227,7 +227,7 @@ class ServiceEntry(models.Model):
 class Comments(models.Model):
 	OBJECT_TYPE = (
 			('Vehicle', 'Vehicle'),
-			('VehicleReminders', 'VehicleReminders'),
+			('VehicleRenewalReminder', 'VehicleRenewalReminder'),
 			('ServiceReminders', 'ServiceReminders'),
 			('Issues','Issues'),
 			('FuelEntry','FuelEntry'),

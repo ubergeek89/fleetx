@@ -33,7 +33,20 @@
           <div class="navbar-custom-menu">
             <ul class="nav navbar-nav">
               <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{user.contact.account.organization_name}} <span class="caret"></span></a>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Master Records <span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+                  <li><a href="#" style="color: #753434;">Vehicle Types</a></li>
+                  <li><a href="#" style="color: #753434;">Vehicle Status</a></li>
+                  <li><a href="#" style="color: #753434;">Vehicle Makes</a></li>
+                  <li><a href="#" style="color: #753434;">Vehicle Models</a></li>
+                  <li><a href="#" style="color: #753434;">Vehicle Renewal Reminder Types</a></li>
+                  <li><a href="#" style="color: #753434;">Service Reminder Types</a></li>
+                  <li><a href="#" style="color: #753434;">Vendor Types</a></li>
+                </ul>
+              </li>
+
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{user.contact.full_name}} <span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
                   <li><a href="{% url 'fleetxapp:profile' %}" style="color: #753434;">My Profile</a></li>
                   <li><a href="{% url 'fleetxapp:logout' %}" style="color: #753434;">Logout</a></li>
@@ -48,7 +61,7 @@
           <ul class="sidebar-menu" data-widget="tree">
             <li><a href="{% url 'fleetxapp:dashboard' %}"><i class="fa fa-home"></i> <span>Dashboard</span></a></li>
             <li><a href="{% url 'fleetxapp:vehicles' %}"><i class="fa fa-truck"></i> <span>Vehicles</span></a></li>
-            <li><a href="{% url 'fleetxapp:vehiclereminders' %}"><i class="fa fa-calendar-check-o"></i> <span>Vehicle Reminders</span></a></li>
+            <li><a href="{% url 'fleetxapp:vehiclerenewalreminders' %}"><i class="fa fa-calendar-check-o"></i> <span>Vehicle Renewal Reminders</span></a></li>
             <li><a href="{% url 'fleetxapp:servicereminders' %}"><i class="fa fa-calendar-check-o"></i> <span>Service Reminders</span></a></li>            
             <li><a href="{% url 'fleetxapp:issues' %}"><i class="fa fa-support"></i> <span>Issues</span></a></li>
             <li><a href="{% url 'fleetxapp:serviceentries' %}"><i class="fa fa-wrench"></i> <span>Service Entries</span></a></li>                        

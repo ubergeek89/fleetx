@@ -38,6 +38,7 @@ HOME_URL = "localhost:8002"
 
 INSTALLED_APPS = [
     'FleetXApp.apps.FleetxappConfig',
+    'FleetXWebsite.apps.FleetxwebsiteConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

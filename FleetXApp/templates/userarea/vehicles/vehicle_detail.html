@@ -51,7 +51,7 @@
                   </button>
                   <ul class="dropdown-menu" role="menu">
                     <li><a href="{% url 'fleetxapp:commentadd' object_type='Vehicle' object_id=object.id %}?next={{ request.path }}">Comment</a></li>
-                    <li><a href="{% url 'fleetxapp:vehicleremindersadd' object.id%}">Vehicle Reminder</a></li>
+                    <li><a href="{% url 'fleetxapp:vehiclerenewalremindersadd' object.id%}">Vehicle Renewal Reminder</a></li>
                     <li><a href="{% url 'fleetxapp:serviceremindersadd' object.id%}">Service Reminder</a></li>
                     <li><a href="{% url 'fleetxapp:issuesadd' object.id%}">Issue</a></li>
                     <li><a href="{% url 'fleetxapp:serviceentriesadd' object.id%}">Service Entry</a></li>

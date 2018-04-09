@@ -36,12 +36,12 @@ class MasterMakesAdmin(admin.ModelAdmin):
 class MasterModelsAdmin(admin.ModelAdmin):
     list_display = ('account', 'vehicle_make', 'vehicle_model')
 
-@admin.register(models.MasterVehicleReminderTypes)
-class MasterVehicleReminderTypesAdmin(admin.ModelAdmin):
+@admin.register(models.MasterVehicleRenewalReminderType)
+class MasterVehicleRenewalReminderTypeAdmin(admin.ModelAdmin):
     list_display = ('account', 'reminder_type')
 
-@admin.register(models.VehicleReminders)
-class VehicleRemindersAdmin(admin.ModelAdmin):
+@admin.register(models.VehicleRenewalReminder)
+class VehicleRenewalReminderAdmin(admin.ModelAdmin):
     list_display = ('account', 'vehicle', 'vehicle_reminder_type')
 
 @admin.register(models.MasterServiceReminderTypes)

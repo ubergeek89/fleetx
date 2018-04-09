@@ -1,0 +1,54 @@
+{% extends 'userarea/base.html' %}
+
+
+{% block body %}
+{% load staticfiles %}
+
+<div class="content-wrapper">
+   <section class="content container-fluid">
+      <div class="row">
+         <div class="col-md-12">
+            <div class="box box-success">
+               <div class="box-header with-border">
+                  <h3 class="box-title">List Of All Vehicle Renewal Reminders</h3>
+                  <div class="box-tools pull-right">
+                      <a href="{% url 'fleetxapp:vehiclerenewalremindersadd' 0 %}">
+                        <button type="submit" class="btn btn-success btn-flat">Add New Vehicle Renewal Reminder</button>
+                      </a>
+                  </div>
+               </div>
+               <div class="box-body table-responsive">
+                  <table id="example1" class="table table-bordered table-hover">
+                     <thead>
+                        <tr>
+                           <th>Vehicle Reminder No.</th>                          
+                           <th>Vehicle</th>
+                           <th>Reminder Type</th>
+                           <th>Due Date</th>
+                           <th>Current Status</th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                      {% for object in object_list %}
+                        <tr>
+                           <td><a href="{% url 'fleetxapp:vehiclerenewalreminderdetail' object.id%}">{{object.id}}</a></td>
+                           <td><a href="{% url 'fleetxapp:vehicledetail' object.vehicle.id %}">{{object.vehicle.name}}</a></td>
+                           <td>{{object.vehicle_reminder_type.reminder_type}}</td>
+                           <td>{{object.due_date}}</td>                           
+                           <td></td>
+                        </tr>
+                      {% endfor %}
+                     </tbody>
+                  </table>
+               </div>
+            </div>
+         </div>
+      </div>
+   </section>
+</div>
+
+
+
+
+
+{% endblock %}

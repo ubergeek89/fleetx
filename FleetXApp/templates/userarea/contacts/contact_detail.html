@@ -20,7 +20,7 @@
                <div class="box-body table-responsive">
                   <table class="table table-bordered table-hover">
                     <tr>
-                       <td>Contact Name:</td>
+                       <td>Full Name:</td>
                        <td>{{object.full_name}}</td>
                     </tr>
                     <tr>
@@ -28,13 +28,18 @@
                        <td>{{object.email}}</td>
                     </tr>
                     <tr>
-                       <td>Is Driver:</td>
+                       <td>Is Driver (Can login to driver app) :</td>
                        <td>{{object.is_driver}}</td>
                     </tr>
                     <tr>
-                       <td>Is Owner:</td>
+                       <td>Is Owner (Can edit and view account settings) :</td>
                        <td>{{object.is_owner}}</td>
                     </tr>
+                    <tr>
+                       <td>Is User (Can login to the web app) :</td>
+                       <td>{{object.is_owner}}</td>
+                    </tr>
+
                   </table>  
                </div>
             </div>

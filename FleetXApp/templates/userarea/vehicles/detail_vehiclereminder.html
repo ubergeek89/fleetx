@@ -10,9 +10,9 @@
          <div class="col-md-12">
             <div class="box box-success">
                <div class="box-header with-border">
-                  <h3 class="box-title">Vehicle Reminder #{{vehiclereminderdetail.id}}</h3>
+                  <h3 class="box-title">Vehicle Renewal Reminder #{{vehiclerenewalreminderdetail.id}}</h3>
                   <div class="box-tools pull-right">
-                      <a href="{% url 'fleetxapp:vehicleremindersedit' vehiclereminderdetail.id %}">
+                      <a href="{% url 'fleetxapp:vehiclerenewalremindersedit' vehiclerenewalreminderdetail.id %}">
                         <button type="submit" class="btn btn-success btn-flat">Edit</button>
                       </a>
                   </div>
@@ -21,27 +21,27 @@
                   <table class="table table-bordered table-hover">
                     <tr>
                        <td width="20%">Vehicle Name:</td>
-                       <td><a href="{% url 'fleetxapp:vehicledetail' vehiclereminderdetail.vehicle.id %}">{{vehiclereminderdetail.vehicle.name}}</a></td>
+                       <td><a href="{% url 'fleetxapp:vehicledetail' vehiclerenewalreminderdetail.vehicle.id %}">{{vehiclerenewalreminderdetail.vehicle.name}}</a></td>
                     </tr>
                     <tr>
                        <td>Vehicle Reminder Type:</td>
-                       <td>{{vehiclereminderdetail.vehicle_reminder_type.reminder_type}}</td>
+                       <td>{{vehiclerenewalreminderdetail.vehicle_reminder_type.reminder_type}}</td>
                     </tr>
                     <tr>
                        <td>Due Date:</td>
-                       <td>{{vehiclereminderdetail.due_date}}</td>
+                       <td>{{vehiclerenewalreminderdetail.due_date}}</td>
                     </tr>
                     <tr>
                        <td>Days Treshold:</td>
-                       <td>{{vehiclereminderdetail.days_treshold}}</td>
+                       <td>{{vehiclerenewalreminderdetail.days_treshold}}</td>
                     </tr>
                     <tr>
                        <td>Email Notifications :</td>
-                       <td>{{vehiclereminderdetail.email_notifications}}</td>
+                       <td>{{vehiclerenewalreminderdetail.email_notifications}}</td>
                     </tr>
                     <tr>
                        <td>Notify Contacts :</td>
-                       <td>{% for k in vehiclereminderdetail.notify_contacts.all %}{{k.full_name}}, {% endfor %}</td>
+                       <td>{% for k in vehiclerenewalreminderdetail.notify_contacts.all %}{{k.full_name}}, {% endfor %}</td>
                     </tr>
                   </table>  
                </div>
@@ -62,8 +62,8 @@
                         singleWidget.onUploadComplete(function(info) {
                           obj = {
                             url : info.cdnUrl,
-                            linked_object_type: 'VehicleReminders',
-                            linked_object_id: {{vehiclereminderdetail.id}},
+                            linked_object_type: 'VehicleRenewalReminder',
+                            linked_object_id: {{vehiclerenewalreminderdetail.id}},
                             name: info.name,
                             uuid: info.uuid
                           }
@@ -119,7 +119,7 @@
                <div class="box-header with-border">
                   <h3 class="box-title">Comments</h3>
                   <div class="box-tools pull-right">
-                      <a href="{% url 'fleetxapp:commentadd' object_type='VehicleReminders' object_id=vehiclereminderdetail.id %}?next={{ request.path }}">
+                      <a href="{% url 'fleetxapp:commentadd' object_type='VehicleRenewalReminder' object_id=vehiclerenewalreminderdetail.id %}?next={{ request.path }}">
                         <button type="submit" class="btn btn-success btn-flat">Add New Comment</button>
                       </a>
                   </div>

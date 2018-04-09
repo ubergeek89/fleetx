@@ -41,7 +41,7 @@ class RegisterView(FormView):
 				full_name=form.cleaned_data['full_name'], email=form.cleaned_data['email'],
 				password=form.cleaned_data['password'])
 			a.save()
-			link = "http://"+django_settings.HOME_URL+"/emailconfirm/" + uid + "/"
+			link = "http://"+django_settings.HOME_URL+"/app/emailconfirm/" + uid + "/"
 			template = get_template('emails/email_signup.html')
 			html_content = template.render({"confirmlink":link})
 			subject = "Please validate your email address."
@@ -59,7 +59,7 @@ class EmailConfirmView(View):
 		User.objects.create_user(signupobj.email, signupobj.email, signupobj.password)
 		user = authenticate(username=signupobj.email, password=signupobj.password)
 		ac = models.Account.objects.create(owner = user, timezone="GMT", organization_name=signupobj.organization_name)
-		models.Contact.objects.create(user=user, account=ac, full_name=signupobj.full_name)
+		models.Contact.objects.create(user=user, account=ac, full_name=signupobj.full_name, is_owner=True)
 		login(request,user)
 		signupobj.delete()
 		return HttpResponseRedirect(reverse('fleetxapp:dashboard'))
@@ -145,14 +145,14 @@ class FileUploadView(View):
 @method_decorator(login_required, name='dispatch')
 class CommentAddView(View):
 	def get(self, request, object_id, object_type):
-		if object_type not in ['Vehicle','Issues','ServiceReminders','VehicleReminders','FuelEntry','ServiceEntry','Contact']:
+		if object_type not in ['Vehicle','Issues','ServiceReminders','VehicleRenewalReminder','FuelEntry','ServiceEntry','Contact']:
 			raise Http404
 		mymodel = apps.get_model('FleetXApp', object_type)
 		myobject = get_object_or_404(mymodel, pk=object_id)
 		form = forms.CommentForm()
 		return render(request, "userarea/add_comment.html", {'form':form, 'page_title':'Add Comment To '+object_type+' #'+str(object_id) })
 	def post(self, request, object_id, object_type, *args, **kwargs):
-		if object_type not in ['Vehicle','Issues','ServiceReminders','VehicleReminders','FuelEntry','ServiceEntry','Contact']:
+		if object_type not in ['Vehicle','Issues','ServiceReminders','VehicleRenewalReminder','FuelEntry','ServiceEntry','Contact']:
 			raise Http404
 		mymodel = apps.get_model('FleetXApp', object_type)
 		myobject = get_object_or_404(mymodel, pk=object_id)		
@@ -277,7 +277,7 @@ class VehicleAllRemindersView(DetailView):
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
-		context['vehiclereminders'] = models.VehicleReminders.objects.filter(account=self.request.user.contact.account,
+		context['vehiclerenewalreminders'] = models.VehicleRenewalReminder.objects.filter(account=self.request.user.contact.account,
 				vehicle__id = self.kwargs['pk']
 			)
 		context['servicereminders'] = models.ServiceReminders.objects.filter(account=self.request.user.contact.account,
@@ -332,18 +332,18 @@ class VehicleAllServiceEnties(DetailView):
 
 
 @method_decorator(login_required, name='dispatch')
-class VehicleReminderDetail(View):
+class VehicleRenewalReminderDetail(View):
 	def get(self, request, pk):
 		template_name = "userarea/vehicles/detail_vehiclereminder.html"
 		context={}
-		context['vehiclereminderdetail'] = get_object_or_404(models.VehicleReminders, pk=self.kwargs['pk'])
-		context['object'] = get_object_or_404(models.Vehicle, pk=context['vehiclereminderdetail'].vehicle.id)
+		context['vehiclerenewalreminderdetail'] = get_object_or_404(models.VehicleRenewalReminder, pk=self.kwargs['pk'])
+		context['object'] = get_object_or_404(models.Vehicle, pk=context['vehiclerenewalreminderdetail'].vehicle.id)
 		context['comments'] = models.Comments.objects.filter(account=self.request.user.contact.account,
-				linked_object_type = 'VehicleReminders',
+				linked_object_type = 'VehicleRenewalReminder',
 				linked_object_id=self.kwargs['pk']
 			).order_by('-timestamp')
 		context['files'] = models.Files.objects.filter(account=self.request.user.contact.account,
-				linked_object_type = 'VehicleReminders',
+				linked_object_type = 'VehicleRenewalReminder',
 				linked_object_id=self.kwargs['pk']
 			).order_by('-upload_timestamp')
 		context['reminderstab']=True		
@@ -433,59 +433,57 @@ class FuelEntryDetail(View):
 
 
 @method_decorator(login_required, name='dispatch')
-class VehicleReminderListView(ListView):
-	model = models.VehicleReminders	
-	template_name = "userarea/reminders/vehiclereminders.html"
+class VehicleRenewalReminderListView(ListView):
+	model = models.VehicleRenewalReminder	
+	template_name = "userarea/reminders/vehiclerenewalreminders.html"
 	def get_queryset(self):
-		queryset = models.VehicleReminders.objects.filter(account=self.request.user.contact.account)
+		queryset = models.VehicleRenewalReminder.objects.filter(account=self.request.user.contact.account)
 		return queryset
 
 
 @method_decorator(login_required, name='dispatch')
-class VehicleReminderAddView(View):
+class VehicleRenewalReminderAddView(View):
 	def get(self, request, pk):
 		if pk > 0:
 			object = get_object_or_404(models.Vehicle, pk=pk)
-			form = forms.VehicleReminderForm(initial={'vehicle':object})
+			form = forms.VehicleRenewalReminderForm(initial={'vehicle':object})
 		else:
-			form = forms.VehicleReminderForm()
+			form = forms.VehicleRenewalReminderForm()
 		form.fields['vehicle'].queryset = models.Vehicle.objects.filter(account=self.request.user.contact.account)
-		form.fields['vehicle_reminder_type'].queryset = models.MasterVehicleReminderTypes.objects.filter(account=self.request.user.contact.account)
+		form.fields['vehicle_reminder_type'].queryset = models.MasterVehicleRenewalReminderType.objects.filter(account=self.request.user.contact.account)
 		form.fields['notify_contacts'].queryset = models.Contact.objects.filter(account=self.request.user.contact.account)
-		return render(request, "userarea/reminders/vehiclereminder_new.html", {'form':form, 'page_title':'Add Vehicle Reminder'})
+		return render(request, "userarea/reminders/vehiclerenewalreminder_new.html", {'form':form, 'page_title':'Add Vehicle Renewal Reminder'})
 	def post(self, request, *args, **kwargs):
-		form = forms.VehicleReminderForm(request.POST)
+		form = forms.VehicleRenewalReminderForm(request.POST)
 		if form.is_valid():
 			instance = form.save(commit=False)
 			instance.account = self.request.user.contact.account
 			instance.save()
 			form.save_m2m()
-			#Crazy - http://www.joshuakehn.com/2013/6/23/django-m2m-modelform.html
-			return HttpResponseRedirect(reverse('fleetxapp:vehiclereminderdetail', args=[instance.id]))
-		return render(request, "userarea/reminders/vehiclereminder_new.html", {'form':form, 'page_title':'Add Vehicle Reminder'})
+			return HttpResponseRedirect(reverse('fleetxapp:vehiclerenewalreminderdetail', args=[instance.id]))
+		return render(request, "userarea/reminders/vehiclerenewalreminder_new.html", {'form':form, 'page_title':'Add Vehicle Renewal Reminder'})
 
 
 
 @method_decorator(login_required, name='dispatch')
-class VehicleReminderEditView(View):
+class VehicleRenewalReminderEditView(View):
 	def get(self, request, pk):
-		object = get_object_or_404(models.VehicleReminders, pk=pk)
-		form = forms.VehicleReminderForm(instance=object)
+		object = get_object_or_404(models.VehicleRenewalReminder, pk=pk)
+		form = forms.VehicleRenewalReminderForm(instance=object)
 		form.fields['vehicle'].queryset = models.Vehicle.objects.filter(account=self.request.user.contact.account)
-		form.fields['vehicle_reminder_type'].queryset = models.MasterVehicleReminderTypes.objects.filter(account=self.request.user.contact.account)
+		form.fields['vehicle_reminder_type'].queryset = models.MasterVehicleRenewalReminderType.objects.filter(account=self.request.user.contact.account)
 		form.fields['notify_contacts'].queryset = models.Contact.objects.filter(account=self.request.user.contact.account)
-		return render(request, "userarea/reminders/vehiclereminder_new.html", {'form':form, 'page_title':'Edit Vehicle Reminder'})
+		return render(request, "userarea/reminders/vehiclerenewalreminder_new.html", {'form':form, 'page_title':'Edit Vehicle Renewal Reminder'})
 	def post(self, request, pk, *args, **kwargs):
-		object = get_object_or_404(models.VehicleReminders, pk=pk)
-		form = forms.VehicleReminderForm(request.POST, instance=object)
+		object = get_object_or_404(models.VehicleRenewalReminder, pk=pk)
+		form = forms.VehicleRenewalReminderForm(request.POST, instance=object)
 		if form.is_valid():
 			instance = form.save(commit=False)
 			instance.account = self.request.user.contact.account
 			instance.save()
 			form.save_m2m()
-			#Crazy - http://www.joshuakehn.com/2013/6/23/django-m2m-modelform.html
-			return HttpResponseRedirect(reverse('fleetxapp:vehiclereminderdetail', args=[instance.id]))
-		return render(request, "userarea/reminders/vehiclereminder_new.html", {'form':form, 'page_title':'Edit Vehicle Reminder'})
+			return HttpResponseRedirect(reverse('fleetxapp:vehiclerenewalreminderdetail', args=[instance.id]))
+		return render(request, "userarea/reminders/vehiclerenewalreminder_new.html", {'form':form, 'page_title':'Edit Vehicle Renewal Reminder'})
 
 
 @method_decorator(login_required, name='dispatch')
@@ -516,7 +514,6 @@ class ServiceReminderAddView(View):
 			instance.account = self.request.user.contact.account
 			instance.save()
 			form.save_m2m()
-			#Crazy - http://www.joshuakehn.com/2013/6/23/django-m2m-modelform.html
 			return HttpResponseRedirect(reverse('fleetxapp:servicereminderdetail', args=[instance.id]))
 		return render(request, "userarea/reminders/servicereminder_new.html", {'form':form, 'page_title':'Add Service Reminder'})
 
@@ -539,7 +536,6 @@ class ServiceReminderEditView(View):
 			instance.account = self.request.user.contact.account
 			instance.save()
 			form.save_m2m()
-			#Crazy - http://www.joshuakehn.com/2013/6/23/django-m2m-modelform.html
 			return HttpResponseRedirect(reverse('fleetxapp:servicereminderdetail', args=[instance.id]))
 		return render(request, "userarea/reminders/servicereminder_new.html", {'form':form, 'page_title':'Edit Service Reminder'})
 
@@ -571,7 +567,6 @@ class IssueAddView(View):
 			instance.account = self.request.user.contact.account
 			instance.save()
 			form.save_m2m()
-			#Crazy - http://www.joshuakehn.com/2013/6/23/django-m2m-modelform.html
 			return HttpResponseRedirect(reverse('fleetxapp:issuedetail', args=[instance.id]))
 		return render(request, "userarea/issues/issue_new.html", {'form':form, 'page_title':'Add Issue'})
 
@@ -592,7 +587,6 @@ class IssueEditView(View):
 			instance.account = self.request.user.contact.account
 			instance.save()
 			form.save_m2m()
-			#Crazy - http://www.joshuakehn.com/2013/6/23/django-m2m-modelform.html
 			return HttpResponseRedirect(reverse('fleetxapp:issuedetail', args=[instance.id]))
 		return render(request, "userarea/issues/issue_new.html", {'form':form, 'page_title':'Edit Issue'})
 
@@ -620,7 +614,6 @@ class VendorsAddView(View):
 			instance.account = self.request.user.contact.account
 			instance.save()
 			form.save_m2m()
-			#Crazy - http://www.joshuakehn.com/2013/6/23/django-m2m-modelform.html
 			return HttpResponseRedirect(reverse('fleetxapp:vendors'))
 		return render(request, "userarea/issues/issue_new.html", {'form':form, 'page_title':'Add Vendor'})
 
@@ -641,7 +634,6 @@ class VendorsEditView(View):
 			instance.account = self.request.user.contact.account
 			instance.save()
 			form.save_m2m()
-			#Crazy - http://www.joshuakehn.com/2013/6/23/django-m2m-modelform.html
 			return HttpResponseRedirect(reverse('fleetxapp:vendors'))
 		return render(request, "userarea/vendors/vendors_new.html", {'form':form, 'page_title':'Edit Vendor'})
 
@@ -672,7 +664,6 @@ class FuelEntryAddView(View):
 			instance.account = self.request.user.contact.account
 			instance.save()
 			form.save_m2m()
-			#Crazy - http://www.joshuakehn.com/2013/6/23/django-m2m-modelform.html
 			return HttpResponseRedirect(reverse('fleetxapp:fuelentrydetail', args=[instance.id]))
 		return render(request, "userarea/fuelentries/fuelentries_new.html", {'form':form, 'page_title':'Add Fuel Entry'})
 
@@ -693,7 +684,6 @@ class FuelEntryEditView(View):
 			instance.account = self.request.user.contact.account
 			instance.save()
 			form.save_m2m()
-			#Crazy - http://www.joshuakehn.com/2013/6/23/django-m2m-modelform.html
 			return HttpResponseRedirect(reverse('fleetxapp:fuelentrydetail', args=[instance.id]))
 		return render(request, "userarea/fuelentries/fuelentries_new.html", {'form':form, 'page_title':'Edit Fuel Entry'})
 

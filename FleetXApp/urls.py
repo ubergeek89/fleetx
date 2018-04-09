@@ -25,15 +25,15 @@ urlpatterns = [
     path('vehicle/<int:pk>/fuelentries', views.VehicleAllFuelEnties.as_view(), name='vehicleallfuelentries'),
     path('vehicle/<int:pk>/serviceentries', views.VehicleAllServiceEnties.as_view(), name='vehicleallserviceentries'),
 
-    path('vehicle/vehiclereminder/<int:pk>/', views.VehicleReminderDetail.as_view(), name='vehiclereminderdetail'),
+    path('vehicle/vehiclerenewalreminder/<int:pk>/', views.VehicleRenewalReminderDetail.as_view(), name='vehiclerenewalreminderdetail'),
     path('vehicle/servicereminders/<int:pk>/', views.ServiceReminderDetail.as_view(), name='servicereminderdetail'),
     path('vehicle/issues/<int:pk>/', views.IssueDetail.as_view(), name='issuedetail'),
     path('vehicle/fuelentries/<int:pk>/', views.FuelEntryDetail.as_view(), name='fuelentrydetail'),
     path('vehicle/serviceentries/<int:pk>/', views.ServiceEntryDetail.as_view(), name='serviceentrydetail'),
 
-    path('vehiclereminders/', views.VehicleReminderListView.as_view(), name='vehiclereminders'),
-    path('vehiclereminders/<int:pk>/new', views.VehicleReminderAddView.as_view(), name='vehicleremindersadd'),
-    path('vehiclereminders/edit/<int:pk>/', views.VehicleReminderEditView.as_view(), name='vehicleremindersedit'),    
+    path('vehiclerenewalreminders/', views.VehicleRenewalReminderListView.as_view(), name='vehiclerenewalreminders'),
+    path('vehiclerenewalreminders/<int:pk>/new', views.VehicleRenewalReminderAddView.as_view(), name='vehiclerenewalremindersadd'),
+    path('vehiclerenewalreminders/edit/<int:pk>/', views.VehicleRenewalReminderEditView.as_view(), name='vehiclerenewalremindersedit'),    
 
     path('servicereminders/', views.ServiceReminderListView.as_view(), name='servicereminders'),
     path('servicereminders/<int:pk>/new', views.ServiceReminderAddView.as_view(), name='serviceremindersadd'),

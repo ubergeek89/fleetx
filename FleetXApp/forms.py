@@ -55,9 +55,9 @@ class VehicleForm(forms.ModelForm):
 			'assigned_to': forms.Select(attrs={'class':'select2'}),
 		}
 
-class VehicleReminderForm(forms.ModelForm):
+class VehicleRenewalReminderForm(forms.ModelForm):
 	class Meta:
-		model=models.VehicleReminders
+		model=models.VehicleRenewalReminder
 		exclude = ['account']
 		widgets = {
 			'vehicle': forms.Select(attrs={'class':'select2'}),
