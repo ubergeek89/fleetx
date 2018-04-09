@@ -17,5 +17,5 @@ class IndexView(View):
 		html_content = template.render({"name":name, "phone":phone, "fleet_size":fleet_size, "thank_you":True})
 		subject = "New Lead At FleetX"
 
-		utils.send_email(subject,"aditya@espertosys.com",html_content)
+		utils.send_email(subject,"aditya@fleetxhq.com",html_content)
 		return render(request, "website/index.html")

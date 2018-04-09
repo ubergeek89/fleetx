@@ -47,6 +47,17 @@ class RegisterView(FormView):
 			subject = "Please validate your email address."
 			utils.send_email(subject,form.cleaned_data['email'],html_content)
 
+			template = get_template('emails/admin_newsignup.html')
+			html_content = template.render({
+					"organization_name" : form.cleaned_data['organization_name'],
+					"fleet_size" : form.cleaned_data['fleet_size'],
+					"full_name" : form.cleaned_data['full_name'],
+					"email" : form.cleaned_data['email'],
+					"phone_number" : form.cleaned_data['phone_number']
+				})
+			subject = "New Registration At FleetX"
+			utils.send_email(subject,"aditya@fleetxhq.com",html_content)
+
 			form = self.form_class(initial=self.initial)
 			return render(request, self.template_name, {'form': form , 'form_success':True})
 		return render(request, self.template_name, {'form': form})
