@@ -45,7 +45,7 @@ class RegisterView(FormView):
 			template = get_template('emails/email_signup.html')
 			html_content = template.render({"confirmlink":link})
 			subject = "Please validate your email address."
-			utils.send_email(subject,"aditya@espertosys.com",html_content)
+			utils.send_email(subject,form.cleaned_data['email'],html_content)
 
 			form = self.form_class(initial=self.initial)
 			return render(request, self.template_name, {'form': form , 'form_success':True})
@@ -87,7 +87,7 @@ class ForgotPasswordView(FormView):
 			template = get_template('emails/email_forgotpassword.html')
 			html_content = template.render({"newpassword":uid})
 			subject = "Your new password at FleetX"
-			utils.send_email(subject,"aditya@espertosys.com",html_content)
+			utils.send_email(subject,form.cleaned_data["email"],html_content)
 			form = self.form_class(initial=self.initial)
 			return render(request, self.template_name, {'form': form , 'form_success':True})
 		return render(request, self.template_name, {'form': form})
