@@ -60,7 +60,6 @@ urlpatterns = [
     path('contacts/edit/<int:pk>/', views.ContactEditView.as_view(), name='contactsedit'),
     path('contact/<int:pk>/', views.ContactDetailView.as_view(), name='contactdetail'),
 
-
     path('reports/', views.ReportListView.as_view(), name='reports'),
     path('settings/', views.SettingsView.as_view(), name='settings'),
     path('profile/', views.ProfileView.as_view(), name='profile'),

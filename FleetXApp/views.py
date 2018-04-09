@@ -41,7 +41,7 @@ class RegisterView(FormView):
 				full_name=form.cleaned_data['full_name'], email=form.cleaned_data['email'],
 				password=form.cleaned_data['password'])
 			a.save()
-			link = "http://"+django_settings.HOME_URL+"/app/emailconfirm/" + uid + "/"
+			link = "http://"+str(request.get_host())+"/app/emailconfirm/" + uid + "/"
 			template = get_template('emails/email_signup.html')
 			html_content = template.render({"confirmlink":link})
 			subject = "Please validate your email address."
@@ -101,7 +101,6 @@ class LoginView(FormView):
 	def get(self, request):
 		if request.user.is_authenticated:
 			return HttpResponseRedirect(reverse('fleetxapp:dashboard'))
-
 		form = self.form_class(initial=self.initial)
 		return render(request, self.template_name, {'form': form})
 
