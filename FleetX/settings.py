@@ -28,6 +28,7 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 ROOT_URLCONF = 'FleetX.urls'
+STATIC_ROOT = '/home/fleetx/fleetx_static'
 
 LOGIN_REDIRECT_URL = '/dashboard'
 LOGIN_URL='/'
