@@ -117,9 +117,83 @@ class ServiceEntryForm(forms.ModelForm):
 		}
 
 class ContactForm(forms.ModelForm):
+	email = forms.EmailField()
 	class Meta:
 		model=models.Contact
 		exclude = ['account','user','is_owner']
 		widgets = {
 			'profilepicture': forms.Select(attrs={'class':'select2'}),
+			'country': forms.Select(attrs={'class':'select2'}),
 		}
+
+class ContactPasswordForm(forms.Form):
+	password = forms.CharField(max_length=30, min_length=8, required=True, widget=forms.PasswordInput(attrs={'class': 'form-control','placeholder': 'Password'}))
+	confirm_password = forms.CharField(max_length=30, min_length=8, required=True, widget=forms.PasswordInput(attrs={'class': 'form-control','placeholder': 'Confirm Password'}))
+	def clean(self):
+		cleaned_data = super(ContactPasswordForm, self).clean()
+		password = cleaned_data.get("password")
+		confirm_password = cleaned_data.get("confirm_password")
+		if password != confirm_password:
+			raise forms.ValidationError("Passwords Do Not Match")
+
+
+class AccountForm(forms.ModelForm):
+	class Meta:
+		model=models.Account
+		exclude = ['owner','accountstatus','signup_timestamp']
+		widgets = {
+			'country': forms.Select(attrs={'class':'select2'}),
+			'timezone': forms.Select(attrs={'class':'select2'}),
+		}
+
+class OdometerEntryForm(forms.ModelForm):
+	class Meta:
+		model=models.OdometerEntry
+		exclude = ['account','timestamp','reported_by']
+		widgets = {
+			'vehicle': forms.Select(attrs={'class':'select2'}),
+		}
+
+
+
+
+
+
+class MasterVehicleTypesForm(forms.ModelForm):
+	class Meta:
+		model=models.MasterVehicleTypes
+		exclude = ['account']
+
+class MasterVehicleStatusForm(forms.ModelForm):
+	class Meta:
+		model=models.MasterVehicleStatus
+		exclude = ['account']
+
+class MasterMakesForm(forms.ModelForm):
+	class Meta:
+		model=models.MasterMakes
+		exclude = ['account']
+
+class MasterModelsForm(forms.ModelForm):
+	class Meta:
+		model=models.MasterModels
+		exclude = ['account']
+		widgets = {
+			'vehicle_make': forms.Select(attrs={'class':'select2'}),
+		}
+
+class MasterVehicleRenewalReminderTypeForm(forms.ModelForm):
+	class Meta:
+		model=models.MasterVehicleRenewalReminderType
+		exclude = ['account']
+
+class MasterServiceReminderTypesForm(forms.ModelForm):
+	class Meta:
+		model=models.MasterServiceReminderTypes
+		exclude = ['account']
+
+class MasterVendorTypesForm(forms.ModelForm):
+	class Meta:
+		model=models.MasterVendorTypes
+		exclude = ['account']
+

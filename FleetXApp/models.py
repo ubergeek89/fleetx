@@ -1,6 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
 from datetime import datetime
+from django_countries.fields import CountryField
+from timezone_field import TimeZoneField
+from timezone_field import TimeZoneFormField
 
 class Signups(models.Model):
 	uuid = models.CharField(max_length=100)
@@ -19,9 +22,13 @@ class Account(models.Model):
 		)
 	owner = models.ForeignKey(User, on_delete=models.CASCADE)
 	organization_name = models.CharField(max_length=100)
-	timezone = models.CharField(max_length=100, default="GMT")
+	timezone = TimeZoneField(default='GMT')
 	accountstatus = models.CharField(max_length=50, choices=ACCOUNT_STATUS, default="FREETRIAL")
 	signup_timestamp = models.DateTimeField(default = datetime.now)
+	address = models.CharField(max_length=30, blank=True)
+	city = models.CharField(max_length=30, blank=True)
+	state = models.CharField(max_length=30, blank=True)
+	country = CountryField()
 
 	def __str__(self):
 		return "Account ID: "+ str(self.pk) + " Owner: "+ self.owner.username
@@ -55,8 +62,7 @@ class Files(models.Model):
 	uploaded_by = models.ForeignKey("Contact", on_delete=models.DO_NOTHING)
 
 	def __str__(self):
-		return "File: "+ str(self.name)
-
+		return str(self.name)
 
 
 class Contact(models.Model):
@@ -64,13 +70,18 @@ class Contact(models.Model):
 	account = models.ForeignKey(Account, on_delete=models.CASCADE)
 	profilepicture = models.ForeignKey(Files, on_delete=models.DO_NOTHING, blank=True, null=True)
 	full_name = models.CharField(max_length=30)
-	email = models.EmailField(blank=True)
+	phone_number = models.CharField(max_length=30, blank=True)
+	address = models.CharField(max_length=30, blank=True)
+	city = models.CharField(max_length=30, blank=True)
+	state = models.CharField(max_length=30, blank=True)
+	country = CountryField()
+	zipcode = models.CharField(max_length=30, blank=True)
 	is_driver = models.BooleanField(default=False)
 	is_owner = models.BooleanField(default=False)
 	is_user = models.BooleanField(default=False)
 
 	def __str__(self):
-		return "Contact: "+ str(self.full_name)
+		return str(self.full_name)
 
 
 class MasterVehicleTypes(models.Model):
@@ -78,7 +89,7 @@ class MasterVehicleTypes(models.Model):
 	vehicle_type = models.CharField(max_length=30)
 
 	def __str__(self):
-		return "VehicleType: "+ str(self.vehicle_type)
+		return str(self.vehicle_type)
 
 class MasterVehicleStatus(models.Model):
 	account = models.ForeignKey(Account, on_delete=models.CASCADE)
@@ -86,14 +97,14 @@ class MasterVehicleStatus(models.Model):
 	color = models.CharField(max_length=30, blank=False)
 
 	def __str__(self):
-		return "VehicleStatus: "+ str(self.vehicle_status)
+		return str(self.vehicle_status)
 
 class MasterMakes(models.Model):
 	account = models.ForeignKey(Account, on_delete=models.CASCADE)
 	vehicle_make = models.CharField(max_length=30)
 
 	def __str__(self):
-		return "VehicleMakes: "+ str(self.vehicle_make)
+		return str(self.vehicle_make)
 
 class MasterModels(models.Model):
 	account = models.ForeignKey(Account, on_delete=models.CASCADE)
@@ -101,7 +112,7 @@ class MasterModels(models.Model):
 	vehicle_model = models.CharField(max_length=30)
 
 	def __str__(self):
-		return "VehicleModel: "+ str(self.vehicle_model)
+		return str(self.vehicle_model)
 
 class Vehicle(models.Model):
 	account = models.ForeignKey(Account, on_delete=models.CASCADE)
@@ -116,7 +127,18 @@ class Vehicle(models.Model):
 	assigned_to = models.ForeignKey(Contact, on_delete=models.CASCADE, blank=True, null=True)
 
 	def __str__(self):
-		return "Vehicle: "+ str(self.name)
+		return str(self.name)
+
+
+class OdometerEntry(models.Model):
+	account = models.ForeignKey(Account, on_delete=models.CASCADE)
+	vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE)
+	timestamp = models.DateTimeField(default = datetime.now)
+	reported_by = models.ForeignKey(Contact, on_delete=models.DO_NOTHING)
+	reading = models.IntegerField()
+
+	def __str__(self):
+		return "Odometer Reading: "+ str(self.id)
 
 
 class MasterVehicleRenewalReminderType(models.Model):
@@ -124,7 +146,7 @@ class MasterVehicleRenewalReminderType(models.Model):
 	reminder_type = models.CharField(max_length=70)
 
 	def __str__(self):
-		return "MasterVehicleRenewalReminderType: "+ str(self.reminder_type)
+		return str(self.reminder_type)
 
 class VehicleRenewalReminder(models.Model):
 	account = models.ForeignKey(Account, on_delete=models.CASCADE)
@@ -143,7 +165,7 @@ class MasterServiceReminderTypes(models.Model):
 	reminder_type = models.CharField(max_length=70)
 
 	def __str__(self):
-		return "VehicleReminderType: "+ str(self.reminder_type)
+		return str(self.reminder_type)
 
 class ServiceReminders(models.Model):
 	account = models.ForeignKey(Account, on_delete=models.CASCADE)
@@ -182,7 +204,7 @@ class MasterVendorTypes(models.Model):
 	vendor_type = models.CharField(max_length=100)
 
 	def __str__(self):
-		return "VendorType: "+ self.vendor_type
+		return self.vendor_type
 
 
 class Vendors(models.Model):
@@ -191,7 +213,7 @@ class Vendors(models.Model):
 	vendor_type = models.ForeignKey(MasterVendorTypes, on_delete=models.DO_NOTHING)
 
 	def __str__(self):
-		return "Vendor: "+ self.name
+		return self.name
 
 
 class FuelEntry(models.Model):

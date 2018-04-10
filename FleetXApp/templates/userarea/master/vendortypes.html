@@ -56,28 +56,27 @@
 		    </div>
 		  </div>
 
-      <div class="row">
-         <div class="col-md-12">
-            <div class="box box-success">
-               <div class="box-header with-border">
-                  <h3 class="box-title">Edit Master</h3>
-               </div>
-               <div class="box-body table-responsive">
-                  <table id="example1" class="table table-bordered table-hover">
-                     <tbody>
-                        <tr><td><a href="{% url 'fleetxapp:mastervehicletypesedit' %}">Vehicle Types</a></td></tr>
-                        <tr><td><a href="{% url 'fleetxapp:mastervehiclestatusedit' %}">Vehicle Status</a></td></tr>
-                        <tr><td><a href="{% url 'fleetxapp:mastermakesedit' %}">Vehicle Makes</a></td></tr>
-                        <tr><td><a href="{% url 'fleetxapp:mastermodelsedit' %}">Vehicle Models</a></td></tr>
-                        <tr><td><a href="{% url 'fleetxapp:mastervehiclerenewalremindertypeedit' %}">Vehicle Renewal Reminder Types</a></td></tr>
-                        <tr><td><a href="{% url 'fleetxapp:masterserviceremindertypesedit' %}">Service Reminder Types</a></td></tr>
-                        <tr><td><a href="{% url 'fleetxapp:mastervendortypesedit' %}">Vendor Types</a></td></tr>
-                     </tbody>
-                  </table>
-               </div>
-            </div>
-         </div>
-      </div>
+
+	      <div class="row">
+	         <div class="col-md-12">
+	            <div class="box box-success">
+	               <div class="box-header with-border">
+	                  <h3 class="box-title">Vendor Types</h3>
+	               </div>
+	               <div class="box-body table-responsive">
+	                  <table class="table table-bordered table-hover">
+	                     <tbody>
+	                      {% for object in object_list %}
+	                        <tr>
+	                           <td>{{object.vendor_type}}</td>
+	                        </tr>
+	                      {% endfor %}
+	                     </tbody>
+	                  </table>
+	               </div>
+	            </div>
+	         </div>
+	      </div>
 
           </section>
       </div>

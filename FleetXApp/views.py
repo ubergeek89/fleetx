@@ -21,6 +21,7 @@ import os
 import json
 import uuid
 import datetime
+import pytz
 
 class RegisterView(FormView):
 	template_name = "userarea/register.html"
@@ -69,8 +70,8 @@ class EmailConfirmView(View):
 		signupobj= get_object_or_404(models.Signups, uuid=uid)
 		User.objects.create_user(signupobj.email, signupobj.email, signupobj.password)
 		user = authenticate(username=signupobj.email, password=signupobj.password)
-		ac = models.Account.objects.create(owner = user, timezone="GMT", organization_name=signupobj.organization_name)
-		models.Contact.objects.create(user=user, account=ac, full_name=signupobj.full_name, is_owner=True)
+		ac = models.Account.objects.create(owner = user, organization_name=signupobj.organization_name)
+		models.Contact.objects.create(user=user, account=ac, full_name=signupobj.full_name, is_owner=True, is_user=True)
 		login(request,user)
 		signupobj.delete()
 		return HttpResponseRedirect(reverse('fleetxapp:dashboard'))
@@ -84,7 +85,6 @@ class ForgotPasswordView(FormView):
 	def get(self, request):
 		if request.user.is_authenticated:
 			return HttpResponseRedirect(reverse('fleetxapp:dashboard'))
-
 		form = self.form_class(initial=self.initial)
 		return render(request, self.template_name, {'form': form})
 
@@ -118,6 +118,10 @@ class LoginView(FormView):
 	def post(self, request, *args, **kwargs):
 		form = self.form_class(request.POST)
 		if form.is_valid():
+			#k = get_object_or_404(User, email=form.cleaned_data["email"])
+			#if not user.contact.is_user:
+			#	return HttpResponseRedirect(reverse('fleetxapp:login'))
+
 			user = authenticate(username=form.cleaned_data["email"], password=form.cleaned_data["password"])
 			if user==None:
 				return render(request, self.template_name, {'form': form , 'other_error':"Incorrect password"})
@@ -200,6 +204,10 @@ class VehicleDetailView(DetailView):
 	template_name = "userarea/vehicles/vehicle_detail.html"
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
+		odometer_latest = models.OdometerEntry.objects.filter(account=self.request.user.contact.account,
+				vehicle__id = self.kwargs['pk']
+			).order_by('-id').first()
+		context['odometer_latest'] = odometer_latest
 		context['vehicledetails']=True
 		return context
 
@@ -284,15 +292,39 @@ class VehicleCommentsView(DetailView):
 class VehicleAllRemindersView(DetailView):
 	model = models.Vehicle
 	template_name = "userarea/vehicles/vehicle_allreminders.html"
-
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
-		context['vehiclerenewalreminders'] = models.VehicleRenewalReminder.objects.filter(account=self.request.user.contact.account,
+		querydata = models.VehicleRenewalReminder.objects.filter(account=self.request.user.contact.account,
 				vehicle__id = self.kwargs['pk']
 			)
-		context['servicereminders'] = models.ServiceReminders.objects.filter(account=self.request.user.contact.account,
+		objectlist = []
+		for q in querydata:
+			k = q.due_date - timezone.now().date()
+			if k.days > q.days_treshold:
+				status="scheduled"
+			if k.days <= q.days_treshold:
+				status="duesoon"
+			if k.days < 0:
+				status="overdue"
+			q.status = status
+			objectlist.append(q)
+		context['vehiclerenewalreminders'] = objectlist
+		querydata = models.ServiceReminders.objects.filter(account=self.request.user.contact.account,
 				vehicle__id = self.kwargs['pk']
 			)
+		objectlist = []
+		for q in querydata:
+			odometer_latest = models.OdometerEntry.objects.filter(account=self.request.user.contact.account,
+				vehicle = q.vehicle).order_by('-id').first()
+			k = q.odometer_reading - q.odometer_treshold
+			if odometer_latest.reading < k:
+				q.status = "scheduled"
+			if odometer_latest.reading >= k:
+				q.status = "duesoon"
+			if odometer_latest.reading > q.odometer_reading:
+				q.status = "overdue"
+			objectlist.append(q)
+		context['servicereminders'] = objectlist
 
 		context['reminderstab']=True		
 		return context
@@ -328,7 +360,7 @@ class VehicleAllFuelEnties(DetailView):
 
 
 @method_decorator(login_required, name='dispatch')
-class VehicleAllServiceEnties(DetailView):
+class VehicleAllServiceEntries(DetailView):
 	model = models.Vehicle
 	template_name = "userarea/vehicles/vehicle_allserviceentries.html"
 
@@ -340,13 +372,57 @@ class VehicleAllServiceEnties(DetailView):
 		context['vehicleserviceentriestab']=True		
 		return context
 
+@method_decorator(login_required, name='dispatch')
+class VehicleOdometerHistory(DetailView):
+	model = models.Vehicle
+	template_name = "userarea/vehicles/vehicle_odometerhistory.html"
+
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['odometerhistory'] = models.OdometerEntry.objects.filter(account=self.request.user.contact.account,
+				vehicle__id = self.kwargs['pk']
+			).order_by('-id')
+		context['odometerhistorytab']=True		
+		return context
+
+
+
+@method_decorator(login_required, name='dispatch')
+class OdometerEntryAdd(View):
+	def get(self, request, pk):
+		object = get_object_or_404(models.Vehicle, pk=pk)
+		form = forms.OdometerEntryForm(initial={'vehicle':object})
+		form.fields['vehicle'].queryset = models.Vehicle.objects.filter(account=self.request.user.contact.account)
+		return render(request, "userarea/vehicles/odometer_new.html", {'form':form, 'page_title':'Add New Odometer Entry'})
+	def post(self, request, pk, *args, **kwargs):
+		form = forms.OdometerEntryForm(request.POST)
+		if form.is_valid():
+			instance = form.save(commit=False)
+			instance.account = self.request.user.contact.account
+			instance.reported_by = self.request.user.contact
+			instance.save()
+			form.save_m2m()
+			return HttpResponseRedirect(reverse('fleetxapp:odometerhistory', args=[pk]))
+		return render(request, "userarea/vehicles/odometer_new.html", {'form':form, 'page_title':'Add New Odometer Entry'})
+
+
+
 
 @method_decorator(login_required, name='dispatch')
 class VehicleRenewalReminderDetail(View):
 	def get(self, request, pk):
 		template_name = "userarea/vehicles/detail_vehiclereminder.html"
 		context={}
-		context['vehiclerenewalreminderdetail'] = get_object_or_404(models.VehicleRenewalReminder, pk=self.kwargs['pk'])
+		obj = get_object_or_404(models.VehicleRenewalReminder, pk=self.kwargs['pk'])
+		k = obj.due_date - timezone.now().date()
+		if k.days > obj.days_treshold:
+			status="scheduled"
+		if k.days <= obj.days_treshold:
+			status="duesoon"
+		if k.days < 0:
+			status="overdue"
+		obj.status = status
+		context['vehiclerenewalreminderdetail'] = obj
 		context['object'] = get_object_or_404(models.Vehicle, pk=context['vehiclerenewalreminderdetail'].vehicle.id)
 		context['comments'] = models.Comments.objects.filter(account=self.request.user.contact.account,
 				linked_object_type = 'VehicleRenewalReminder',
@@ -365,8 +441,21 @@ class ServiceReminderDetail(View):
 	def get(self, request, pk):
 		template_name = "userarea/vehicles/detail_servicereminder.html"
 		context={}
-		context['servicereminderdetail'] = get_object_or_404(models.ServiceReminders, pk=self.kwargs['pk'])
-		context['object'] = get_object_or_404(models.Vehicle, pk=context['servicereminderdetail'].vehicle.id)
+		obj = get_object_or_404(models.ServiceReminders, pk=self.kwargs['pk'])
+		vehicleobj = obj.vehicle
+
+		odometer_latest = models.OdometerEntry.objects.filter(account=self.request.user.contact.account,
+			vehicle = vehicleobj).order_by('-id').first()
+		k = obj.odometer_reading - obj.odometer_treshold
+		if odometer_latest.reading < k:
+			obj.status = "scheduled"
+		if odometer_latest.reading >= k:
+			obj.status = "duesoon"
+		if odometer_latest.reading > obj.odometer_reading:
+			obj.status = "overdue"
+
+		context['servicereminderdetail'] = obj
+		context['object'] = vehicleobj
 		context['comments'] = models.Comments.objects.filter(account=self.request.user.contact.account,
 				linked_object_type = 'ServiceReminders',
 				linked_object_id=self.kwargs['pk']
@@ -446,9 +535,24 @@ class FuelEntryDetail(View):
 class VehicleRenewalReminderListView(ListView):
 	model = models.VehicleRenewalReminder	
 	template_name = "userarea/reminders/vehiclerenewalreminders.html"
-	def get_queryset(self):
-		queryset = models.VehicleRenewalReminder.objects.filter(account=self.request.user.contact.account)
-		return queryset
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		querydata = models.VehicleRenewalReminder.objects.filter(account=self.request.user.contact.account)
+		objectlist = []
+		for q in querydata:
+			k = q.due_date - timezone.now().date()
+			if k.days > q.days_treshold:
+				status="scheduled"
+			if k.days <= q.days_treshold:
+				status="duesoon"
+			if k.days < 0:
+				status="overdue"
+			q.status = status
+			objectlist.append(q)
+		context['object_list'] = objectlist
+		return context
+
+
 
 
 @method_decorator(login_required, name='dispatch')
@@ -500,9 +604,23 @@ class VehicleRenewalReminderEditView(View):
 class ServiceReminderListView(ListView):
 	model = models.ServiceReminders	
 	template_name = "userarea/reminders/servicereminders.html"
-	def get_queryset(self):
-		queryset = models.ServiceReminders.objects.filter(account=self.request.user.contact.account)
-		return queryset
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		querydata = models.ServiceReminders.objects.filter(account=self.request.user.contact.account)
+		objectlist = []
+		for q in querydata:
+			odometer_latest = models.OdometerEntry.objects.filter(account=self.request.user.contact.account,
+				vehicle = q.vehicle).order_by('-id').first()
+			k = q.odometer_reading - q.odometer_treshold
+			if odometer_latest.reading < k:
+				q.status = "scheduled"
+			if odometer_latest.reading >= k:
+				q.status = "duesoon"
+			if odometer_latest.reading > q.odometer_reading:
+				q.status = "overdue"
+			objectlist.append(q)
+		context['object_list'] = objectlist
+		return context
 
 
 @method_decorator(login_required, name='dispatch')
@@ -766,8 +884,11 @@ class ContactAddView(View):
 	def post(self, request, *args, **kwargs):
 		form = forms.ContactForm(request.POST)
 		if form.is_valid():
+			uid = uuid.uuid4().hex[:20]
+			user = User.objects.create_user(form.cleaned_data['email'], form.cleaned_data['email'], uid)
 			instance = form.save(commit=False)
 			instance.account = self.request.user.contact.account
+			instance.user = user
 			instance.save()
 			form.save_m2m()
 			return HttpResponseRedirect(reverse('fleetxapp:contactdetail',args=[instance.id]))
@@ -779,7 +900,7 @@ class ContactAddView(View):
 class ContactEditView(View):
 	def get(self, request, pk):
 		object = get_object_or_404(models.Contact, pk=pk)
-		form = forms.ContactForm(instance=object)
+		form = forms.ContactForm(instance=object, initial={'email':object.user.email})
 		form.fields['profilepicture'].queryset = models.Files.objects.filter(account=self.request.user.contact.account, 
 			file_type='IMAGE', linked_object_type='Contact', linked_object_id=pk)
 		return render(request, "userarea/contacts/contacts_new.html", {'form':form, 'page_title':'Edit Contact'})
@@ -791,6 +912,9 @@ class ContactEditView(View):
 			instance.account = self.request.user.contact.account
 			instance.save()
 			form.save_m2m()
+			instance.user.email = form.cleaned_data['email']
+			instance.user.username = form.cleaned_data['email']
+			instance.user.save()
 			return HttpResponseRedirect(reverse('fleetxapp:contactdetail',args=[instance.id]))
 		return render(request, "userarea/contacts/contacts_new.html", {'form':form, 'page_title':'Edit Contact'})
 
@@ -815,13 +939,179 @@ class ContactDetailView(DetailView):
 
 
 @method_decorator(login_required, name='dispatch')
+class ContactPasswordEditView(View):
+	def get(self, request, pk):
+		form = forms.ContactPasswordForm()
+		return render(request, "userarea/contacts/contact_password.html", {'form':form, 'page_title':'Edit Password For Contact #'+str(pk)})
+	def post(self, request, pk, *args, **kwargs):
+		object = get_object_or_404(models.Contact, pk=pk)
+		form = forms.ContactPasswordForm(request.POST)
+		if form.is_valid():
+			object.user.set_password(form.cleaned_data['password'])
+			object.user.save()
+			return HttpResponseRedirect(reverse('fleetxapp:contactdetail',args=[pk]))
+		return render(request, "userarea/contacts/contact_password.html", {'form':form, 'page_title':'Edit Password For Contact #'+str(pk)})
+
+
+
+@method_decorator(login_required, name='dispatch')
+class SettingsEditView(View):
+	def get(self, request):
+		object = get_object_or_404(models.Account, pk=request.user.contact.account.id)
+		form = forms.AccountForm(instance=object)
+		return render(request, "userarea/settings.html", {'form':form, 'page_title':'Edit Settings'})
+	def post(self, request, *args, **kwargs):
+		object = get_object_or_404(models.Account, pk=request.user.contact.account.id)
+		form = forms.AccountForm(request.POST, instance=object)
+		if form.is_valid():
+			instance = form.save(commit=False)
+			instance.save()
+			form.save_m2m()
+			return HttpResponseRedirect(reverse('fleetxapp:settingsedit'))
+		return render(request, "userarea/settings.html", {'form':form, 'page_title':'Edit Settings'})
+
+
+@method_decorator(login_required, name='dispatch')
 class ReportListView(TemplateView):
 	template_name = "userarea/reports.html"
 
 @method_decorator(login_required, name='dispatch')
-class SettingsView(TemplateView):
-	template_name = "userarea/settings.html"
-
-@method_decorator(login_required, name='dispatch')
 class ProfileView(TemplateView):
 	template_name = "userarea/profile.html"
+
+
+
+
+
+
+
+
+
+
+
+
+@method_decorator(login_required, name='dispatch')
+class MasterVehicleTypesEdit(View):
+	def get(self, request):
+		form = forms.MasterVehicleTypesForm()
+		object_list = models.MasterVehicleTypes.objects.filter(account=self.request.user.contact.account)
+		return render(request, "userarea/master/vehicletypes.html", {'form':form, 'page_title':'Add New Vehicle Type', 'object_list':object_list})
+	def post(self, request, *args, **kwargs):
+		form = forms.MasterVehicleTypesForm(request.POST)
+		object_list = models.MasterVehicleTypes.objects.filter(account=self.request.user.contact.account)
+		if form.is_valid():
+			instance = form.save(commit=False)
+			instance.account = self.request.user.contact.account
+			instance.save()
+			form.save_m2m()
+			return HttpResponseRedirect(reverse('fleetxapp:mastervehicletypesedit'))
+		return render(request, "userarea/master/vehicletypes.html", {'form':form, 'page_title':'Add New Vehicle Type', 'object_list':object_list})
+
+@method_decorator(login_required, name='dispatch')
+class MasterVehicleStatusEdit(View):
+	def get(self, request):
+		form = forms.MasterVehicleStatusForm()
+		object_list = models.MasterVehicleStatus.objects.filter(account=self.request.user.contact.account)
+		return render(request, "userarea/master/vehiclestatus.html", {'form':form, 'page_title':'Add New Vehicle Status', 'object_list':object_list})
+	def post(self, request, *args, **kwargs):
+		form = forms.MasterVehicleStatusForm(request.POST)
+		object_list = models.MasterVehicleStatus.objects.filter(account=self.request.user.contact.account)
+		if form.is_valid():
+			instance = form.save(commit=False)
+			instance.account = self.request.user.contact.account
+			instance.save()
+			form.save_m2m()
+			return HttpResponseRedirect(reverse('fleetxapp:mastervehiclestatusedit'))
+		return render(request, "userarea/master/vehicletypes.html", {'form':form, 'page_title':'Add New Vehicle Status', 'object_list':object_list})
+
+
+@method_decorator(login_required, name='dispatch')
+class MasterMakesEdit(View):
+	def get(self, request):
+		form = forms.MasterMakesForm()
+		object_list = models.MasterMakes.objects.filter(account=self.request.user.contact.account)
+		return render(request, "userarea/master/vehiclemakes.html", {'form':form, 'page_title':'Add New Vehicle Make', 'object_list':object_list})
+	def post(self, request, *args, **kwargs):
+		form = forms.MasterMakesForm(request.POST)
+		object_list = models.MasterMakes.objects.filter(account=self.request.user.contact.account)
+		if form.is_valid():
+			instance = form.save(commit=False)
+			instance.account = self.request.user.contact.account
+			instance.save()
+			form.save_m2m()
+			return HttpResponseRedirect(reverse('fleetxapp:mastermakesedit'))
+		return render(request, "userarea/master/vehiclemakes.html", {'form':form, 'page_title':'Add New Vehicle Make', 'object_list':object_list})
+
+
+@method_decorator(login_required, name='dispatch')
+class MasterModelsEdit(View):
+	def get(self, request):
+		form = forms.MasterModelsForm()
+		form.fields['vehicle_make'].queryset = models.MasterMakes.objects.filter(account=self.request.user.contact.account)
+		object_list = models.MasterModels.objects.filter(account=self.request.user.contact.account)
+		return render(request, "userarea/master/vehiclemodels.html", {'form':form, 'page_title':'Add New Vehicle Model', 'object_list':object_list})
+	def post(self, request, *args, **kwargs):
+		form = forms.MasterModelsForm(request.POST)
+		object_list = models.MasterModels.objects.filter(account=self.request.user.contact.account)
+		if form.is_valid():
+			instance = form.save(commit=False)
+			instance.account = self.request.user.contact.account
+			instance.save()
+			form.save_m2m()
+			return HttpResponseRedirect(reverse('fleetxapp:mastermodelsedit'))
+		return render(request, "userarea/master/vehiclemodels.html", {'form':form, 'page_title':'Add New Vehicle Model', 'object_list':object_list})
+
+
+@method_decorator(login_required, name='dispatch')
+class MasterVehicleRenewalReminderTypeEdit(View):
+	def get(self, request):
+		form = forms.MasterVehicleRenewalReminderTypeForm()
+		object_list = models.MasterVehicleRenewalReminderType.objects.filter(account=self.request.user.contact.account)
+		return render(request, "userarea/master/vehiclerenewalremindertypes.html", {'form':form, 'page_title':'Add New Vehicle Renewal Reminder Type', 'object_list':object_list})
+	def post(self, request, *args, **kwargs):
+		form = forms.MasterVehicleRenewalReminderTypeForm(request.POST)
+		object_list = models.MasterVehicleRenewalReminderType.objects.filter(account=self.request.user.contact.account)
+		if form.is_valid():
+			instance = form.save(commit=False)
+			instance.account = self.request.user.contact.account
+			instance.save()
+			form.save_m2m()
+			return HttpResponseRedirect(reverse('fleetxapp:mastervehiclerenewalremindertypeedit'))
+		return render(request, "userarea/master/vehiclerenewalremindertypes.html", {'form':form, 'page_title':'Add New Vehicle Renewal Reminder Type', 'object_list':object_list})
+
+
+@method_decorator(login_required, name='dispatch')
+class MasterServiceReminderTypesEdit(View):
+	def get(self, request):
+		form = forms.MasterServiceReminderTypesForm()
+		object_list = models.MasterServiceReminderTypes.objects.filter(account=self.request.user.contact.account)
+		return render(request, "userarea/master/serviceremindertypes.html", {'form':form, 'page_title':'Add New Service Reminder Type', 'object_list':object_list})
+	def post(self, request, *args, **kwargs):
+		form = forms.MasterServiceReminderTypesForm(request.POST)
+		object_list = models.MasterServiceReminderTypes.objects.filter(account=self.request.user.contact.account)
+		if form.is_valid():
+			instance = form.save(commit=False)
+			instance.account = self.request.user.contact.account
+			instance.save()
+			form.save_m2m()
+			return HttpResponseRedirect(reverse('fleetxapp:masterserviceremindertypesedit'))
+		return render(request, "userarea/master/serviceremindertypes.html", {'form':form, 'page_title':'Add New Service Reminder Type', 'object_list':object_list})
+
+
+@method_decorator(login_required, name='dispatch')
+class MasterVendorTypesEdit(View):
+	def get(self, request):
+		form = forms.MasterVendorTypesForm()
+		object_list = models.MasterVendorTypes.objects.filter(account=self.request.user.contact.account)
+		return render(request, "userarea/master/vendortypes.html", {'form':form, 'page_title':'Add New Vendor Type', 'object_list':object_list})
+	def post(self, request, *args, **kwargs):
+		form = forms.MasterVendorTypesForm(request.POST)
+		object_list = models.MasterVendorTypes.objects.filter(account=self.request.user.contact.account)
+		if form.is_valid():
+			instance = form.save(commit=False)
+			instance.account = self.request.user.contact.account
+			instance.save()
+			form.save_m2m()
+			return HttpResponseRedirect(reverse('fleetxapp:mastervendortypesedit'))
+		return render(request, "userarea/master/vendortypes.html", {'form':form, 'page_title':'Add New Vendor Type', 'object_list':object_list})
+

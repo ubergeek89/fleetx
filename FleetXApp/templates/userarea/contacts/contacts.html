@@ -32,14 +32,14 @@
                            <td><a href="{% url 'fleetxapp:contactdetail' object.id%}">{{object.id}}</a></td>
                            <td>
                             <a href="{% url 'fleetxapp:contactdetail' object.id%}">{{object.full_name}}</a>
-                              {% if user.id|add:0 == object.id %}
-                                <span class="badge bg-blue">Me</span>
+                              {% if user.contact.id == object.id %}
+                                <span class="badge bg-green">Me</span>
                               {% endif %}
-                              {% if user.contact.is_owner %}
-                                <span class="badge bg-blue">Owner</span>
+                              {% if object.is_owner %}
+                                <span class="badge bg-red">Owner</span>
                               {% endif %}
                            </td>
-                           <td>{{object.email}}</td>
+                           <td>{{object.user.email}}</td>
                         </tr>
                       {% endfor %}
                      </tbody>

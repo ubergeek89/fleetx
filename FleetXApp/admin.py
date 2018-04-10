@@ -72,9 +72,9 @@ class FuelEntryAdmin(admin.ModelAdmin):
 class ServiceEntryAdmin(admin.ModelAdmin):
     list_display = ('account', 'vehicle', 'date','vendor')
 
-
-
-
+@admin.register(models.OdometerEntry)
+class OdometerEntryAdmin(admin.ModelAdmin):
+    list_display = ('account', 'vehicle', 'reported_by','timestamp','reading')
 
 
 

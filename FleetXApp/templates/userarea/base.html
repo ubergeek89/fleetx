@@ -57,7 +57,9 @@
             <li><a href="{% url 'fleetxapp:contacts' %}"><i class="fa fa-user"></i> <span>Contacts</span></a></li>
             
             <li><a href="{% url 'fleetxapp:reports' %}"><i class="fa fa-bar-chart"></i> <span>Reports</span></a></li>
-            <li><a href="{% url 'fleetxapp:settings' %}"><i class="fa fa-tv"></i> <span>Settings</span></a></li>
+            {% if user.contact.is_owner %}
+              <li><a href="{% url 'fleetxapp:settingsedit' %}"><i class="fa fa-tv"></i> <span>Settings</span></a></li>
+            {% endif %}
           </ul>
         </section>
       </aside>
@@ -93,7 +95,7 @@
 
       <footer class="main-footer">
         <div class="pull-right hidden-xs">
-          Made with <i class="fa fa-heart"></i> in New Delhi
+          Made with <i class="fa fa-heart"></i> in New Delhi for <b>{{user.contact.account.organization_name}}</b>
         </div>
         <strong>Copyright &copy; 2018 <a href="http://espertosys.com">Espertosys</a></strong> All rights reserved.
       </footer>
@@ -116,13 +118,16 @@
     $('#example1').DataTable()
     $('.my-colorpicker1').colorpicker()    
     $('#id_due_date').datepicker({
-      autoclose: true
+      autoclose: true,
+      format: 'yyyy-mm-dd',
     })
     $('#id_reported_date').datepicker({
-      autoclose: true
+      autoclose: true,
+      format: 'yyyy-mm-dd',
     })
     $('#id_date').datepicker({
-      autoclose: true
+      autoclose: true,
+      format: 'yyyy-mm-dd',
     })
   })
 </script>

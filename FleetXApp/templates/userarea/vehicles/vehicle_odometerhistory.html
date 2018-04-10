@@ -1,0 +1,51 @@
+{% extends 'userarea/vehicles/vehicle_base.html' %}
+{% load staticfiles %}
+
+
+{% block vehiclebody %}
+
+
+   <section class="content container-fluid">
+      <div class="row">
+         <div class="col-md-12">
+            <div class="box box-success">
+               <div class="box-header with-border">
+                  <h3 class="box-title">Odometer History</h3>
+                  <div class="box-tools pull-right">
+                      <a href="{% url 'fleetxapp:odometerentryadd' object.id%}">
+                        <button type="submit" class="btn btn-success btn-flat">Add New Odometer Entry</button>
+                      </a>
+                  </div>
+               </div>
+
+              <div class="box-body table-responsive">
+                  <table class="table table-bordered table-hover">
+                     <thead>
+                        <tr>
+                           <th>Entry No.</th>                           
+                           <th>Vehicle</th>
+                           <th>Timestamp</th>                           
+                           <th>Reported By</th>
+                           <th>Reading</th>                           
+                        </tr>
+                     </thead>
+                     <tbody>
+                      {% for object in odometerhistory %}
+                        <tr>
+                           <td>{{object.id}}</td>                           
+                           <td>{{object.vehicle.name}}</td>
+                           <td>{{object.timestamp}}</td>
+                           <td>{{object.reported_by}}</td>
+                           <td>{{object.reading}}</td>
+                        </tr>
+                      {% endfor %}
+                     </tbody>
+                  </table>
+              </div>
+            </div>
+
+         </div>
+      </div>
+   </section>
+
+{% endblock %}

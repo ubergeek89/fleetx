@@ -43,6 +43,20 @@
                        <td>Notify Contacts :</td>
                        <td>{% for k in vehiclerenewalreminderdetail.notify_contacts.all %}{{k.full_name}}, {% endfor %}</td>
                     </tr>
+                    <tr>
+                       <td>Status :</td>
+                           <td>
+                              {% if vehiclerenewalreminderdetail.status == "scheduled" %}
+                                 <span class="badge" style="background:#00a65a">Scheduled</span>
+                              {% endif %}
+                              {% if vehiclerenewalreminderdetail.status == "duesoon" %}
+                                 <span class="badge" style="background:#e89b3e">Due soon</span>
+                              {% endif %}
+                              {% if vehiclerenewalreminderdetail.status == "overdue" %}
+                                 <span class="badge" style="background:#FF0000">Overdue</span>
+                              {% endif %}
+                           </td>
+                    </tr>
                   </table>  
                </div>
             </div>

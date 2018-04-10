@@ -24,6 +24,8 @@
     <div class="nav-tabs-custom tab-success" style="margin-bottom: 0px;">
       <ul class="nav nav-tabs">
         <li {% if contactdetail %} class="active" {% endif %}><a href="{% url 'fleetxapp:contactdetail' object.id %}">Contact Details</a></li>
+        
+        <li {% if password %} class="active" {% endif %}><a href="{% url 'fleetxapp:contactpasswordedit' object.id %}">Reset Password</a></li>
       </ul>
     </div>
   </section>

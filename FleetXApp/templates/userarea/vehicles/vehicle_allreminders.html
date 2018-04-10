@@ -32,11 +32,22 @@
                      <tbody>
                       {% for object in vehiclerenewalreminders %}
                         <tr>
-                           <td><a href="{% url 'fleetxapp:vehiclerenewalreminderdetail' object.id%}">{{object.id}}</a></td>
+                           <td><a href="{% url 'fleetxapp:vehiclerenewalreminderdetail' object.id%}">#{{object.id}}</a></td>
                            <td><a href="{% url 'fleetxapp:vehicledetail' object.vehicle.id %}">{{object.vehicle.name}}</a></td>
                            <td>{{object.vehicle_reminder_type.reminder_type}}</td>
                            <td>{{object.due_date}}</td>                           
-                           <td></td>
+                           <td>
+                              {% if object.status == "scheduled" %}
+                                 <span class="badge" style="background:#00a65a">Scheduled</span>
+                              {% endif %}
+                              {% if object.status == "duesoon" %}
+                                 <span class="badge" style="background:#e89b3e">Due soon</span>
+                              {% endif %}
+                              {% if object.status == "overdue" %}
+                                 <span class="badge" style="background:#FF0000">Overdue</span>
+                              {% endif %}
+                           </td>
+
                         </tr>
                       {% endfor %}
                      </tbody>
@@ -69,11 +80,22 @@
                      <tbody>
                       {% for object in servicereminders %}
                         <tr>
-                           <td><a href="{% url 'fleetxapp:servicereminderdetail' object.id%}">{{object.id}}</a></td>
+                           <td><a href="{% url 'fleetxapp:servicereminderdetail' object.id%}">#{{object.id}}</a></td>
                            <td><a href="{% url 'fleetxapp:vehicledetail' object.vehicle.id %}">{{object.vehicle.name}}</a></td>
                            <td>{{object.service_reminder_type.reminder_type}}</td>
                            <td>{{object.odometer_reading}}</td>                           
-                           <td></td>
+                           <td>
+                              {% if object.status == "scheduled" %}
+                                 <span class="badge" style="background:#00a65a">Scheduled</span>
+                              {% endif %}
+                              {% if object.status == "duesoon" %}
+                                 <span class="badge" style="background:#e89b3e">Due soon</span>
+                              {% endif %}
+                              {% if object.status == "overdue" %}
+                                 <span class="badge" style="background:#FF0000">Overdue</span>
+                              {% endif %}
+                           </td>
+
                         </tr>
                       {% endfor %}
                      </tbody>

@@ -35,8 +35,8 @@
 		                    <div class="form-group {% if field.errors %}has-error{% endif %}">
 		                      <label class="col-sm-2 control-label">{{ field.label }}: </label>
 		                      <div class="col-sm-10">
-		                        {% if field.name == "email_notifications" %}
-		                          {% render_field field %}
+		                        {% if field.name == "color" %}
+		                          {% render_field field class+="form-control my-colorpicker1" %}
 		                        {% else %}
 		                          {% render_field field class+="form-control" %}
 		                        {% endif %}
@@ -56,28 +56,27 @@
 		    </div>
 		  </div>
 
-      <div class="row">
-         <div class="col-md-12">
-            <div class="box box-success">
-               <div class="box-header with-border">
-                  <h3 class="box-title">Edit Master</h3>
-               </div>
-               <div class="box-body table-responsive">
-                  <table id="example1" class="table table-bordered table-hover">
-                     <tbody>
-                        <tr><td><a href="{% url 'fleetxapp:mastervehicletypesedit' %}">Vehicle Types</a></td></tr>
-                        <tr><td><a href="{% url 'fleetxapp:mastervehiclestatusedit' %}">Vehicle Status</a></td></tr>
-                        <tr><td><a href="{% url 'fleetxapp:mastermakesedit' %}">Vehicle Makes</a></td></tr>
-                        <tr><td><a href="{% url 'fleetxapp:mastermodelsedit' %}">Vehicle Models</a></td></tr>
-                        <tr><td><a href="{% url 'fleetxapp:mastervehiclerenewalremindertypeedit' %}">Vehicle Renewal Reminder Types</a></td></tr>
-                        <tr><td><a href="{% url 'fleetxapp:masterserviceremindertypesedit' %}">Service Reminder Types</a></td></tr>
-                        <tr><td><a href="{% url 'fleetxapp:mastervendortypesedit' %}">Vendor Types</a></td></tr>
-                     </tbody>
-                  </table>
-               </div>
-            </div>
-         </div>
-      </div>
+
+	      <div class="row">
+	         <div class="col-md-12">
+	            <div class="box box-success">
+	               <div class="box-header with-border">
+	                  <h3 class="box-title">Vehicle Status</h3>
+	               </div>
+	               <div class="box-body table-responsive">
+	                  <table class="table table-bordered table-hover">
+	                     <tbody>
+	                      {% for object in object_list %}
+	                        <tr>
+	                           <td><span class="badge" style="background:{{object.color}}">{{object.vehicle_status}}</span></td>
+	                        </tr>
+	                      {% endfor %}
+	                     </tbody>
+	                  </table>
+	               </div>
+	            </div>
+	         </div>
+	      </div>
 
           </section>
       </div>

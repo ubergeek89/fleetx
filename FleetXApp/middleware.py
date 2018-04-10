@@ -9,3 +9,9 @@ class SuperAdminMiddleware(MiddlewareMixin):
 			if request.path.startswith('/admin/')==False:
 				return HttpResponseRedirect("/admin")
 		return None
+
+class TimezoneMiddleware(MiddlewareMixin):
+    def process_request(self, request):
+        if request.user.is_authenticated:
+            if not request.user.is_superuser:
+                timezone.activate(pytz.timezone(str(request.user.contact.account.timezone)))

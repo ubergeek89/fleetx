@@ -31,7 +31,7 @@
         <li {% if vehicleissuestab %} class="active" {% endif %}><a href="{% url 'fleetxapp:vehicleallissues' object.id %}">Issues</a></li>
         <li {% if vehiclefuelentriestab %} class="active" {% endif %}><a href="{% url 'fleetxapp:vehicleallfuelentries' object.id %}">Fuel Entries</a></li>
         <li {% if vehicleserviceentriestab %} class="active" {% endif %}><a href="{% url 'fleetxapp:vehicleallserviceentries' object.id %}">Service Entries</a></li>
-        <li {% if odometerhistory %} class="active" {% endif %}><a href="">Odometer History</a></li>        
+        <li {% if odometerhistorytab %} class="active" {% endif %}><a href="{% url 'fleetxapp:odometerhistory' object.id %}">Odometer History</a></li>        
       </ul>
 
     </div>

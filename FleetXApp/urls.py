@@ -23,7 +23,10 @@ urlpatterns = [
     path('vehicle/<int:pk>/reminders', views.VehicleAllRemindersView.as_view(), name='vehicleallreminders'),
     path('vehicle/<int:pk>/issues', views.VehicleAllIssues.as_view(), name='vehicleallissues'),
     path('vehicle/<int:pk>/fuelentries', views.VehicleAllFuelEnties.as_view(), name='vehicleallfuelentries'),
-    path('vehicle/<int:pk>/serviceentries', views.VehicleAllServiceEnties.as_view(), name='vehicleallserviceentries'),
+    path('vehicle/<int:pk>/serviceentries', views.VehicleAllServiceEntries.as_view(), name='vehicleallserviceentries'),
+    path('vehicle/<int:pk>/odometerhistory', views.VehicleOdometerHistory.as_view(), name='odometerhistory'),
+
+    path('odometerentry/<int:pk>/new', views.OdometerEntryAdd.as_view(), name='odometerentryadd'),
 
     path('vehicle/vehiclerenewalreminder/<int:pk>/', views.VehicleRenewalReminderDetail.as_view(), name='vehiclerenewalreminderdetail'),
     path('vehicle/servicereminders/<int:pk>/', views.ServiceReminderDetail.as_view(), name='servicereminderdetail'),
@@ -59,9 +62,18 @@ urlpatterns = [
     path('contacts/new', views.ContactAddView.as_view(), name='contactsadd'),
     path('contacts/edit/<int:pk>/', views.ContactEditView.as_view(), name='contactsedit'),
     path('contact/<int:pk>/', views.ContactDetailView.as_view(), name='contactdetail'),
+    path('contactpassword/<int:pk>/', views.ContactPasswordEditView.as_view(), name='contactpasswordedit'),
+
+    path('mastervehicletypesedit/', views.MasterVehicleTypesEdit.as_view(), name='mastervehicletypesedit'),
+    path('mastervehiclestatusedit/', views.MasterVehicleStatusEdit.as_view(), name='mastervehiclestatusedit'),
+    path('mastermakesedit/', views.MasterMakesEdit.as_view(), name='mastermakesedit'),
+    path('mastermodelsedit/', views.MasterModelsEdit.as_view(), name='mastermodelsedit'),
+    path('mastervehiclerenewalremindertypeedit/', views.MasterVehicleRenewalReminderTypeEdit.as_view(), name='mastervehiclerenewalremindertypeedit'),
+    path('masterserviceremindertypesedit/', views.MasterServiceReminderTypesEdit.as_view(), name='masterserviceremindertypesedit'),
+    path('mastervendortypesedit/', views.MasterVendorTypesEdit.as_view(), name='mastervendortypesedit'),
 
     path('reports/', views.ReportListView.as_view(), name='reports'),
-    path('settings/', views.SettingsView.as_view(), name='settings'),
+    path('settings/', views.SettingsEditView.as_view(), name='settingsedit'),
     path('profile/', views.ProfileView.as_view(), name='profile'),
     path('logout/', views.LogoutView.as_view(), name='logout'),
 ]

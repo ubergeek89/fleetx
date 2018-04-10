@@ -31,11 +31,21 @@
                      <tbody>
                       {% for object in object_list %}
                         <tr>
-                           <td><a href="{% url 'fleetxapp:servicereminderdetail' object.id%}">{{object.id}}</a></td>
+                           <td><a href="{% url 'fleetxapp:servicereminderdetail' object.id%}">#{{object.id}}</a></td>
                            <td><a href="{% url 'fleetxapp:vehicledetail' object.vehicle.id %}">{{object.vehicle.name}}</a></td>
                            <td>{{object.service_reminder_type.reminder_type}}</td>
                            <td>{{object.odometer_reading}}</td>                           
-                           <td></td>
+                           <td>
+                              {% if object.status == "scheduled" %}
+                                 <span class="badge" style="background:#00a65a">Scheduled</span>
+                              {% endif %}
+                              {% if object.status == "duesoon" %}
+                                 <span class="badge" style="background:#e89b3e">Due soon</span>
+                              {% endif %}
+                              {% if object.status == "overdue" %}
+                                 <span class="badge" style="background:#FF0000">Overdue</span>
+                              {% endif %}
+                           </td>
                         </tr>
                       {% endfor %}
                      </tbody>

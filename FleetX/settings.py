@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'widget_tweaks',    
     'rest_framework',
+    'django_countries',
+    'timezone_field',
 ]
 
 MIDDLEWARE = [
@@ -59,6 +61,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'FleetXApp.middleware.SuperAdminMiddleware',
+    'FleetXApp.middleware.TimezoneMiddleware',
 ]
 
 ROOT_URLCONF = 'FleetX.urls'

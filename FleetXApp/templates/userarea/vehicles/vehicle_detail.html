@@ -12,8 +12,9 @@
               <div class="box-body table-responsive">
                 <div class="row">
                    <div class="col-md-3">
-                        <font size="6" color="#00a65a">1,23,455 miles</font><br />
-                        Odometer reading (<a href="#">Update</a>)
+                        <font size="6" color="#00a65a">{{odometer_latest.reading}} kms</font><br />
+                        Odometer reading<br />
+                        <font size="1">Last Updated : <b>{{odometer_latest.timestamp}}</b></font>
                    </div>
                    <div class="col-md-3">
                         <font size="6" color="#00a65a">$26,000</font><br />
@@ -99,7 +100,11 @@
                     </tr>
                     <tr>
                        <td>Assigned To</td>
-                       <td>{{object.assigned_to.full_name}}</td>
+                       <td>
+                          {% if object.assigned_to %}
+                            <a href="{% url 'fleetxapp:contactdetail' object.assigned_to.id %}">{{object.assigned_to.full_name}}</a>
+                          {% endif %}
+                        </td>
                     </tr>
                   </table>                
                </div>
