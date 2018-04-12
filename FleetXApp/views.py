@@ -687,6 +687,7 @@ class IssueAddView(View):
 		else:
 			form = forms.IssueForm()
 		form.fields['vehicle'].queryset = models.Vehicle.objects.filter(account=self.request.user.contact.account)
+		form.fields['reported_by'].queryset = models.Contact.objects.filter(account=self.request.user.contact.account)
 		return render(request, "userarea/issues/issue_new.html", {'form':form, 'page_title':'Add Issue'})
 	def post(self, request, *args, **kwargs):
 		form = forms.IssueForm(request.POST)
